@@ -1,0 +1,33 @@
+<!-- Load Compress -->
+{% load compress %}
+<!-- Load Static -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>DjangoGPT</title>
+
+		{% compress css %}
+		<link rel="stylesheet" href="{% static 'src/output.css' %}" />
+		{% endcompress %}
+	</head>
+	<body class="bg-gray-200">
+		{% block content %} {% endblock content %}
+
+		<!-- Load HTMX -->
+		{% compress js %}
+		<script type="text/javascript" src="{% static 'src/htmx.js' %}"></script>
+		<script type="text/javascript" src="{% static 'src/ws.js' %}"></script>
+		{% endcompress %}
+
+		<script>
+			document.body.addEventListener('htmx:configRequest', (event) => {
+				event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+			});
+		</script>
+	</body>
+</html>
