@@ -55,7 +55,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         chunks = []  # collect all the chunks in this list
         async for chunk in openai_response:
             message_chunk = chunk.choices[0].delta.content or ''
-            print('message:', message_chunk)
             formatted_chunk = message_chunk.replace("\n", "<br>")
             # markdown_chunk = markdown.markdown(formatted_chunk, extensions=['tables'])
             await self.send(
