@@ -1,0 +1,55 @@
+{% extends "_base.html" %}
+
+{% load custom_filters %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md mx-auto">
+    <div class="bg-base-300 shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h2 class="text-2xl font-bold mb-6 text-center">Register</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="id_username">
+                    Username
+                </label>
+                {{ form.username|add_class:"input input-bordered w-full" }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="id_first_name">
+                    First Name
+                </label>
+                {{ form.first_name|add_class:"input input-bordered w-full" }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="id_last_name">
+                    Last Name
+                </label>
+                {{ form.last_name|add_class:"input input-bordered w-full" }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="id_email">
+                    Email
+                </label>
+                {{ form.email|add_class:"input input-bordered w-full" }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="id_password">
+                    Password
+                </label>
+                {{ form.password|add_class:"input input-bordered w-full" }}
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="id_password2">
+                    Repeat Password
+                </label>
+                {{ form.password2|add_class:"input input-bordered w-full" }}
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="btn btn-primary w-full">Register</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
