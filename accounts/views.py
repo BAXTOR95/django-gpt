@@ -1,20 +1,14 @@
-from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth import login, logout
+from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
 from .forms import UserRegistrationForm, UserProfileForm
 from .models import UserProfile
 
 
-class CustomLoginView(LoginView):
-    template_name = 'registration/login.html'
-
-
 class RegisterView(CreateView):
     form_class = UserRegistrationForm
-    template_name = 'registration/register.html'
+    template_name = 'accounts/register.html'
     success_url = reverse_lazy('profile')
 
     def form_valid(self, form):
@@ -34,13 +28,8 @@ class RegisterView(CreateView):
 
 class ProfileView(LoginRequiredMixin, UpdateView):
     form_class = UserProfileForm
-    template_name = 'registration/profile.html'
+    template_name = 'accounts/profile.html'
     success_url = reverse_lazy('profile')
 
     def get_object(self):
         return self.request.user.userprofile
-
-
-def custom_logout(request):
-    logout(request)
-    return redirect('index')

@@ -4,7 +4,7 @@ from django.db import migrations
 
 
 def add_initial_llm_models(apps, schema_editor):
-    LLMModel = apps.get_model('accounts', 'LLMModel')
+    LLMModel = apps.get_model('chat', 'LLMModel')
     initial_models = [
         'gpt-4o',
         'gpt-4-turbo',
@@ -18,7 +18,7 @@ def add_initial_llm_models(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0001_initial'),
+        ('chat', '0001_initial'),
     ]
 
     operations = [
