@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('chat.urls')),
+    path('chat/', include('chat.urls')),
     path('accounts/', include('accounts.urls')),
     path('__reload__/', include('django_browser_reload.urls')),
 ]

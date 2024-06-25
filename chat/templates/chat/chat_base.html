@@ -1,0 +1,49 @@
+<!-- templates/chat/chat_base.html -->
+{% extends "_base.html" %}
+
+<!-- Content -->
+{% block content %}
+<div class="flex h-screen">
+	<!-- Sidebar -->
+	<div
+		id="sidebar"
+		class="w-64 bg-neutral text-neutral-content p-4 flex flex-col"
+	>
+		{% include 'chat/components/sidebar.html' %}
+	</div>
+
+	<!-- Main Chat Area -->
+	<div id="chat-container" class="flex-1 flex flex-col bg-base-100">
+		{% include 'chat/components/chat_content.html' %}
+	</div>
+</div>
+{% endblock %}
+
+<!-- Scripts -->
+{% block extra_js %}
+<script>
+	document.body.addEventListener('htmx:afterOnLoad', function (event) {
+		if (event.detail.elt.classList.contains('chat-link')) {
+			// Remove 'font-bold' class from all chat links
+			document.querySelectorAll('.chat-link').forEach(function (link) {
+				link.classList.remove('font-bold');
+			});
+			// Add 'font-bold' class to the clicked link
+			event.detail.elt.classList.add('font-bold');
+		}
+	});
+
+	document.body.addEventListener('htmx:wsAfterMessage', function (event) {
+		const messageList = document.getElementById('message-list');
+		if (messageList) {
+			messageList.scrollTop = messageList.scrollHeight;
+		}
+	});
+
+	document.body.addEventListener('htmx:wsAfterSend', function (event) {
+		if (event.detail.elt.tagName === 'FORM') {
+			event.detail.elt.reset();
+		}
+	});
+</script>
+{% endblock extra_js %}

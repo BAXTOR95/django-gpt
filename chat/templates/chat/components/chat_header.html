@@ -1,0 +1,22 @@
+<h1 class="text-xl font-bold">{{ current_chat.title|default:"Select a chat" }}</h1>
+{% if current_chat %}
+    <form hx-post="{% url 'select_model' current_chat.id %}"
+          hx-target="#chat-header"
+          hx-trigger="change from:select[name='model_id']">
+        {% csrf_token %}
+        <select name="model_id" class="select select-bordered w-full max-w-xs">
+            <option disabled>Choose LLM model</option>
+            {% for model in llm_models %}
+                <option value="{{ model.id }}"
+                    {% if current_chat.llm_model == model %}
+                        selected
+                    {% elif not current_chat.llm_model and model == preferred_model %}
+                        selected
+                    {% endif %}
+                >
+                    {{ model.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+{% endif %}

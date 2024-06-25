@@ -1,25 +1,98 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template.response import TemplateResponse
 from django.http import JsonResponse
-from .models import Chat, LLMModel
-
-
-def index(request):
-    return render(request, 'index.html')
+from django.views.decorators.http import require_POST
+from django.template.loader import render_to_string
+from .models import Chat, LLMModel, Message
+from accounts.models import UserProfile
 
 
 @login_required
-def chat(request):
-    recent_chats = Chat.objects.filter(user=request.user).order_by('-created_at')[:5]
+def chat_interface(request):
+    chats = Chat.objects.filter(user=request.user).order_by('-created_at')
     llm_models = LLMModel.objects.all()
+    current_chat = chats.first()  # Default to the most recent chat
+    messages = Message.objects.filter(chat=current_chat) if current_chat else []
+
+    user_profile = UserProfile.objects.get(user=request.user)
+    preferred_model = user_profile.preferred_model
 
     context = {
-        'recent_chats': recent_chats,
+        'chats': chats,
+        'current_chat': current_chat,
+        'messages': messages,
         'llm_models': llm_models,
+        'preferred_model': preferred_model,
+    }
+    return render(request, 'chat/chat_base.html', context)
+
+
+@login_required
+def load_chat(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id, user=request.user)
+    messages = chat.messages.all()
+    llm_models = LLMModel.objects.all()
+    chats = Chat.objects.filter(user=request.user).order_by('-created_at')
+
+    user_profile = UserProfile.objects.get(user=request.user)
+    preferred_model = user_profile.preferred_model
+
+    context = {
+        'current_chat': chat,
+        'messages': messages,
+        'llm_models': llm_models,
+        'chats': chats,
+        'preferred_model': preferred_model,
     }
 
-    return TemplateResponse(request, "single_chat.html", context)
+    return TemplateResponse(request, 'chat/components/chat_content.html', context)
+
+
+@login_required
+@require_POST
+def create_chat(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    preferred_model = user_profile.preferred_model
+
+    chat = Chat.objects.create(
+        user=request.user, title="New Chat", llm_model=preferred_model
+    )
+    chats = Chat.objects.filter(user=request.user).order_by('-created_at')
+    return TemplateResponse(
+        request, 'chat/components/sidebar.html', {'chats': chats, 'current_chat': chat}
+    )
+
+
+@login_required
+@require_POST
+def delete_chat(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id, user=request.user)
+    chat.delete()
+    chats = Chat.objects.filter(user=request.user).order_by('-created_at')
+    return TemplateResponse(request, 'chat/components/sidebar.html', {'chats': chats})
+
+
+@login_required
+@require_POST
+def select_model(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id, user=request.user)
+    model_id = request.POST.get('model_id')
+    if model_id:
+        chat.llm_model = get_object_or_404(LLMModel, id=model_id)
+        chat.save()
+    llm_models = LLMModel.objects.all()
+    user_profile = UserProfile.objects.get(user=request.user)
+    preferred_model = user_profile.preferred_model
+    return TemplateResponse(
+        request,
+        'chat/components/chat_header.html',
+        {
+            'current_chat': chat,
+            'llm_models': llm_models,
+            'preferred_model': preferred_model,
+        },
+    )
 
 
 def toggle_theme(request):

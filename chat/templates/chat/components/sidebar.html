@@ -1,0 +1,40 @@
+<h2 class="text-xl font-bold mb-4">Chats</h2>
+<div class="flex-grow overflow-y-auto">
+	<!-- Recent chats -->
+	<div class="mb-4">
+		<h3 class="text-lg font-semibold mb-2">Recent</h3>
+		<ul>
+			{% for chat in chats %}
+			<li class="mb-2">
+				<a
+					hx-get="{% url 'load_chat' chat.id %}"
+					hx-target="#chat-container"
+					hx-swap="innerHTML"
+					hx-trigger="click"
+					class="chat-link {% if chat.id == current_chat.id %}font-bold{% endif %} hover:text-primary"
+					hx-push-url="false"
+				>
+					{{ chat.title }}
+				</a>
+				<button
+					hx-post="{% url 'delete_chat' chat.id %}"
+					hx-confirm="Are you sure you want to delete this chat?"
+					hx-target="#sidebar"
+					class="text-red-500 ml-2"
+				>
+					X
+				</button>
+			</li>
+			{% empty %}
+			<li>No recent chats</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<button
+		hx-post="{% url 'create_chat' %}"
+		hx-target="#sidebar"
+		class="btn btn-primary mt-4"
+	>
+		New Chat
+	</button>
+</div>

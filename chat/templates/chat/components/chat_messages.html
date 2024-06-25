@@ -1,0 +1,24 @@
+{% if current_chat %}
+<div
+	id="message-list"
+	class="p-6 flex-1 overflow-y-scroll"
+>
+	<div class="mb-4">
+		{% for message in messages %}
+		<div
+			class="chat {% if message.is_user %}chat-end{% else %}chat-start{% endif %} mt-1 rounded-lg p-4"
+		>
+			<div
+				class="chat-bubble {% if message.is_user %}bg-primary text-primary-content{% else %}bg-base-200 text-base-content{% endif %} glass"
+			>
+				{{ message.content }}
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+{% else %}
+<p class="text-center text-gray-500">
+	Select a chat or create a new one to start messaging.
+</p>
+{% endif %}

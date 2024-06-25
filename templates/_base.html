@@ -39,12 +39,12 @@
 						tabindex="0"
 						class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
 					>
-						<li><a href="{% url 'chat' %}">Chat</a></li>
+						<li><a href="{% url 'chat_interface' %}">Chat</a></li>
 					</ul>
 				</div>
 			</div>
 			<div class="navbar-center">
-				<a href="{% url 'index' %}" class="btn btn-ghost normal-case text-xl">DjangoGPT</a>
+				<a href="{% url 'chat_interface' %}" class="btn btn-ghost normal-case text-xl">DjangoGPT</a>
 			</div>
 			<div class="navbar-end">
 				{% if user.is_authenticated %}
@@ -170,5 +170,7 @@
 				event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
 			});
 		</script>
+
+		{% block extra_js %}{% endblock extra_js %}
 	</body>
 </html>
