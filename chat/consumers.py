@@ -1,9 +1,11 @@
 import json
 import uuid
 import logging
+import re
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from asgiref.sync import async_to_sync
 from django.template.loader import render_to_string
 from .models import Chat, Message
 from accounts.models import UserProfile
@@ -59,6 +61,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # Add the new user message to the history
             self.messages.append({"role": "user", "content": message_text})
 
+            # If this is the first message, generate a title
+            if len(self.messages) == 1:
+                await self.generate_chat_title(message_text)
+
             # Create empty AI message
             message_id = f"message-{uuid.uuid4().hex}"
             empty_ai_message_html = render_to_string(
@@ -108,6 +114,45 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
         except Exception as e:
             logger.error(f"Error processing WebSocket message: {str(e)}")
+
+    async def generate_chat_title(self, first_message):
+        client = AsyncOpenAI(api_key=self.user_profile.openai_api_key)
+        try:
+            response = await client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "Generate a short, descriptive title (5 words max) for a chat that starts with this message:",
+                    },
+                    {"role": "user", "content": first_message},
+                ],
+                max_tokens=10,
+            )
+            new_title = response.choices[0].message.content.strip()
+            await self.update_chat_title(new_title)
+        except Exception as e:
+            logger.error(f"Error generating chat title: {str(e)}")
+
+    @database_sync_to_async
+    def update_chat_title(self, new_title):
+        self.chat.title = re.sub(r'[^\w\s]', '', new_title)
+        self.chat.save()
+        async_to_sync(self.channel_layer.group_send)(
+            f"chat_{self.chat_id}",
+            {'type': 'chat_title_update', 'new_title': new_title},
+        )
+
+    async def chat_title_update(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    'type': 'chat_title_update',
+                    'chat_id': self.chat_id,
+                    'new_title': event['new_title'],
+                }
+            )
+        )
 
     @database_sync_to_async
     def get_model_name(self):

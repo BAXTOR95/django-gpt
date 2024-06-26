@@ -1,4 +1,6 @@
-<h1 class="text-xl font-bold">{{ current_chat.title|default:"Select a chat" }}</h1>
+<h1 class="text-xl font-bold" data-chat-id="{{ current_chat.id }}">
+    {{ current_chat.title|default:"Select a chat" }}
+</h1>
 {% if current_chat %}
     <form hx-post="{% url 'select_model' current_chat.id %}"
           hx-target="#chat-header"
@@ -20,3 +22,15 @@
         </select>
     </form>
 {% endif %}
+
+<script>
+    document.body.addEventListener('htmx:wsAfterMessage', function(event) {
+        const message = JSON.parse(event.detail.message);
+        if (message.type === 'chat_title_update') {
+            const headerTitle = document.getElementById('chat-header-title');
+            if (headerTitle && headerTitle.dataset.chatId === message.chat_id) {
+                headerTitle.textContent = message.new_title;
+            }
+        }
+    });
+    </script>

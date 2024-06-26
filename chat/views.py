@@ -66,6 +66,20 @@ def create_chat(request):
 
 @login_required
 @require_POST
+def update_chat_title(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id, user=request.user)
+    new_title = request.POST.get('title')
+    if new_title:
+        chat.title = new_title
+        chat.save()
+    chats = Chat.objects.filter(user=request.user).order_by('-created_at')
+    return TemplateResponse(
+        request, 'chat/components/sidebar.html', {'chats': chats, 'current_chat': chat}
+    )
+
+
+@login_required
+@require_POST
 def delete_chat(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id, user=request.user)
     chat.delete()

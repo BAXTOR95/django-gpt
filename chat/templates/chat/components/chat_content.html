@@ -7,7 +7,7 @@
 <div
 	id="chat-messages"
 	class="flex-1 flex flex-col bg-base-100 shadow-md overflow-y-auto"
-    hx-ext="ws"
+	hx-ext="ws"
 	ws-connect="/ws/chat/{{ current_chat.id }}/"
 >
 	{% include 'chat/components/chat_messages.html' %}
@@ -17,3 +17,15 @@
 		{% include 'chat/components/message_input.html' %}
 	</div>
 </div>
+
+<script>
+	document.body.addEventListener('htmx:wsAfterMessage', function (event) {
+		const message = JSON.parse(event.detail.message);
+		if (message.type === 'chat_title_update') {
+			const headerTitle = document.querySelector('#chat-header h1');
+			if (headerTitle) {
+				headerTitle.textContent = message.new_title;
+			}
+		}
+	});
+</script>

@@ -20,7 +20,7 @@
 {% endblock %}
 
 <!-- Scripts -->
-{% block extra_js %}
+{% block extra_js %} {{ block.super }}
 <script>
 	document.body.addEventListener('htmx:afterOnLoad', function (event) {
 		if (event.detail.elt.classList.contains('chat-link')) {

@@ -14,8 +14,16 @@
 					class="chat-link {% if chat.id == current_chat.id %}font-bold{% endif %} hover:text-primary"
 					hx-push-url="false"
 				>
-					{{ chat.title }}
+					<span class="chat-title" data-chat-id="{{ chat.id }}"
+						>{{ chat.title }}</span
+					>
 				</a>
+				<button
+					onclick="editChatTitle({{ chat.id }})"
+					class="btn btn-xs btn-ghost mr-1"
+				>
+					Edit
+				</button>
 				<button
 					hx-post="{% url 'delete_chat' chat.id %}"
 					hx-confirm="Are you sure you want to delete this chat?"
@@ -38,3 +46,39 @@
 		New Chat
 	</button>
 </div>
+
+<script>
+	function editChatTitle(chatId) {
+		const titleSpan = document.querySelector(
+			`.chat-title[data-chat-id="${chatId}"]`,
+		);
+		const currentTitle = titleSpan.textContent;
+		const newTitle = prompt('Enter new chat title:', currentTitle);
+		if (newTitle && newTitle !== currentTitle) {
+			htmx.ajax('POST', `/chat/update-chat-title/${chatId}/`, {
+				target: '#sidebar',
+				swap: 'innerHTML',
+				values: { title: newTitle },
+			});
+		}
+	}
+
+	document.body.addEventListener('htmx:wsAfterMessage', function (event) {
+		const message = JSON.parse(event.detail.message);
+		if (message.type === 'chat_title_update') {
+			// Update sidebar
+			const titleSpan = document.querySelector(
+				`.chat-title[data-chat-id="${message.chat_id}"]`,
+			);
+			if (titleSpan) {
+				titleSpan.textContent = message.new_title;
+			}
+
+			// Update chat header
+			const headerTitle = document.querySelector('#chat-header h1');
+			if (headerTitle && headerTitle.dataset.chatId === message.chat_id) {
+				headerTitle.textContent = message.new_title;
+			}
+		}
+	});
+</script>
