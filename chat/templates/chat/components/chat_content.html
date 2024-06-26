@@ -4,6 +4,7 @@
 </div>
 
 <!-- Chat Interface -->
+{% if current_chat %}
 <div
 	id="chat-messages"
 	class="flex-1 flex flex-col bg-base-100 shadow-md overflow-y-auto"
@@ -17,6 +18,16 @@
 		{% include 'chat/components/message_input.html' %}
 	</div>
 </div>
+{% else %}
+<div
+	id="chat-messages"
+	class="flex-1 flex flex-col bg-base-100 shadow-md overflow-y-auto"
+>
+	<p class="text-center text-gray-500 mt-8">
+		Select a chat or create a new one to start messaging.
+	</p>
+</div>
+{% endif %}
 
 <script>
 	document.body.addEventListener('htmx:wsAfterMessage', function (event) {

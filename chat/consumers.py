@@ -22,6 +22,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             f"WebSocket connect attempt for chat {self.chat_id} by user {self.user}"
         )
         self.chat = await self.get_chat(self.chat_id)
+
+        if not self.chat:
+            logger.warning(f"Chat {self.chat_id} not found for user {self.user}")
+            await self.close()
+            return
+
         self.user_profile = await self.get_user_profile()
 
         if self.chat and self.user_profile and self.user_profile.openai_api_key:
