@@ -13,5 +13,4 @@ urlpatterns = [
     ),
     path('delete-chat/<int:chat_id>/', views.delete_chat, name='delete_chat'),
     path('select-model/<int:chat_id>/', views.select_model, name='select_model'),
-    path('toggle-theme/', views.toggle_theme, name='toggle-theme'),
 ]

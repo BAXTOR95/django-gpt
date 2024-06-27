@@ -1,9 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template.response import TemplateResponse
-from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.template.loader import render_to_string
 from .models import Chat, LLMModel, Message
 from accounts.models import UserProfile
 
@@ -107,12 +105,3 @@ def select_model(request, chat_id):
             'preferred_model': preferred_model,
         },
     )
-
-
-def toggle_theme(request):
-    if request.method == 'POST':
-        # Get the new theme from the POST request (add logic to handle this)
-        new_theme = 'dark' if request.POST.get('theme') == 'true' else 'light'
-        # Update user's theme setting in the database if necessary
-        return JsonResponse({'success': True, 'theme': new_theme})
-    return JsonResponse({'success': False})

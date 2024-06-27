@@ -4,6 +4,7 @@ module.exports = {
 		'../templates/**/*.html',
 		'../accounts/templates/**/*.html',
 		'../chat/templates/**/*.html',
+		'../pages/templates/**/*.html',
 	],
 	theme: {
 		extend: {},

@@ -44,8 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
+    'core',
     'accounts',
     'chat',
+    'pages',
     'compressor',
     'django_browser_reload',
 ]
@@ -173,3 +175,7 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+# Logout redirect
+
+LOGOUT_REDIRECT_URL = 'home'
