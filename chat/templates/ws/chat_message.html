@@ -1,14 +1,44 @@
 <div id="message-list" hx-swap-oob="beforeend">
-	<div class="mb-4">
-		<div
-			class="chat {% if is_system %}chat-start{% else %}chat-end{% endif %} mt-1 rounded-lg p-4"
-		>
-			<div
-				class="chat-bubble {% if is_system %}bg-base-200 text-base-content{% else %}bg-primary text-primary-content text-right{% endif %} glass"
-				{% if message_id %} id="{{ message_id }}" {% endif %}
-			>
-				{{ message_text }}
+	<div
+		class="chat {% if is_system %}chat-start{% else %}chat-end{% endif %} mt-6"
+	>
+		<div class="chat-image avatar">
+			<div class="w-10 rounded-full">
+				{% if is_system %}
+				<img
+					src="https://api.dicebear.com/6.x/bottts/svg?seed=AI"
+					alt="AI Avatar"
+				/>
+				{% else %}
+				<img
+					src="https://api.dicebear.com/6.x/initials/svg?seed={{ user.username }}"
+					alt="User Avatar"
+				/>
+				{% endif %}
 			</div>
 		</div>
+		<div class="chat-header mb-1">
+			{% if is_system %} AI Assistant {% else %} {{ user.username }} {% endif %}
+			<time class="text-xs opacity-50 ml-1"
+				>{{ message.timestamp|date:"H:i" }}</time
+			>
+		</div>
+		<div
+			class="chat-bubble {% if is_system %}bg-base-200 text-base-content{% else %}bg-primary text-primary-content{% endif %}"
+			{% if message_id %} id="{{ message_id }}" {% endif %}
+		>
+			{{ message_text|linebreaksbr }}
+		</div>
+		<div class="chat-footer opacity-50 text-xs">Delivered</div>
 	</div>
 </div>
+
+<script>
+	function scrollToBottom() {
+		const messageList = document.getElementById('message-list');
+		if (messageList) {
+			messageList.scrollTop = messageList.scrollHeight;
+		}
+	}
+	scrollToBottom();
+</script>

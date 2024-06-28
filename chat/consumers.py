@@ -3,6 +3,7 @@ import uuid
 import logging
 import re
 
+from django.utils import timezone
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
@@ -57,6 +58,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     'message_text': message_text,
                     'is_system': False,
+                    'user': self.user,
+                    'message': {'timestamp': timezone.now()},
                 },
             )
             await self.send(text_data=user_message_html)
@@ -79,6 +82,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'message_text': '',
                     'is_system': True,
                     'message_id': message_id,
+                    'user': self.user,
+                    'message': {'timestamp': timezone.now()},
                 },
             )
             await self.send(text_data=empty_ai_message_html)

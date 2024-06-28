@@ -1,24 +1,73 @@
 {% if current_chat %}
-<div
-	id="message-list"
-	class="p-6 flex-1 overflow-y-scroll"
->
-	<div class="mb-4">
-		{% for message in messages %}
-		<div
-			class="chat {% if message.is_user %}chat-end{% else %}chat-start{% endif %} mt-1 rounded-lg p-4"
-		>
-			<div
-				class="chat-bubble {% if message.is_user %}bg-primary text-primary-content{% else %}bg-base-200 text-base-content{% endif %} glass"
-			>
-				{{ message.content }}
+<div id="message-list" class="flex-1 overflow-y-scroll px-4 py-6 space-y-6">
+	{% for message in messages %}
+	<div
+		class="chat {% if message.is_user %}chat-end{% else %}chat-start{% endif %}"
+	>
+		<div class="chat-image avatar">
+			<div class="w-10 rounded-full">
+				{% if message.is_user %}
+				<img
+					src="https://api.dicebear.com/6.x/initials/svg?seed={{ user.username }}"
+					alt="User Avatar"
+				/>
+				{% else %}
+				<img
+					src="https://api.dicebear.com/6.x/bottts/svg?seed=AI"
+					alt="AI Avatar"
+				/>
+				{% endif %}
 			</div>
 		</div>
-		{% endfor %}
+		<div class="chat-header mb-1">
+			{% if message.is_user %}
+			{{ user.username }}
+			{% else %}
+			AI Assistant
+			{% endif %}
+			<time class="text-xs opacity-50 ml-1"
+				>{{ message.timestamp|date:"H:i" }}</time
+			>
+		</div>
+		<div
+			class="chat-bubble {% if message.is_user %}bg-primary text-primary-content{% else %}bg-base-200 text-base-content{% endif %}"
+		>
+			{{ message.content|linebreaksbr }}
+		</div>
+		<div class="chat-footer opacity-50 text-xs">Delivered</div>
 	</div>
+	{% endfor %}
 </div>
 {% else %}
-<p class="text-center text-gray-500">
-	Select a chat or create a new one to start messaging.
-</p>
+<div class="flex items-center justify-center h-full">
+	<div class="text-center">
+		<div class="avatar placeholder mb-4">
+			<div class="bg-neutral text-neutral-content rounded-full w-24">
+				<span class="text-3xl">?</span>
+			</div>
+		</div>
+		<p class="text-xl font-semibold text-base-content/70">
+			Select a chat or create a new one to start messaging.
+		</p>
+	</div>
+</div>
 {% endif %}
+
+<script>
+	function scrollToBottom() {
+		const messageList = document.getElementById('message-list');
+		if (messageList) {
+			messageList.scrollTop = messageList.scrollHeight;
+		}
+	}
+
+	// Scroll to bottom when new messages are added
+	document.body.addEventListener('htmx:afterOnLoad', function (event) {
+		if (event.detail.elt.id === 'message-list') {
+			scrollToBottom();
+		}
+	});
+
+	// Initial scroll to bottom
+	scrollToBottom();
+</script>

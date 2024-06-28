@@ -1,33 +1,48 @@
-<!-- Header -->
-<div id="chat-header" class="bg-base-200 p-4 flex items-center justify-between">
-	{% include 'chat/components/chat_header.html' %}
-</div>
-
-<!-- Chat Interface -->
-{% if current_chat %}
-<div
-	id="chat-messages"
-	class="flex-1 flex flex-col bg-base-100 shadow-md overflow-y-auto"
-	hx-ext="ws"
-	ws-connect="/ws/chat/{{ current_chat.id }}/"
->
-	{% include 'chat/components/chat_messages.html' %}
-
-	<!-- Message Input Area -->
-	<div id="message-input">
-		{% include 'chat/components/message_input.html' %}
+<div class="flex flex-col">
+	<!-- Header -->
+	<div id="chat-header" class="bg-base-300 p-4 shadow-md">
+		{% include 'chat/components/chat_header.html' %}
 	</div>
+
+	<!-- Chat Interface -->
+	{% if current_chat %}
+	<div
+		id="chat-messages"
+		class="flex-1 flex flex-col bg-base-100 overflow-y-auto"
+		hx-ext="ws"
+		ws-connect="/ws/chat/{{ current_chat.id }}/"
+	>
+		{% include 'chat/components/chat_messages.html' %}
+
+		<!-- Message Input Area -->
+		<div id="message-input" class="p-4">
+			{% include 'chat/components/message_input.html' %}
+		</div>
+	</div>
+
+	{% else %}
+	<div id="chat-messages" class="flex-1 flex flex-col items-center justify-center bg-base-100 p-8 overflow-y-auto">
+		<div class="card w-96 bg-base-200 shadow-xl">
+			<div class="card-body items-center text-center">
+				<h2 class="card-title">Welcome to DjangoGPT!</h2>
+				<p class="text-base-content/70">
+					Select a chat or create a new one to start messaging.
+				</p>
+				<div class="card-actions justify-end">
+					<button
+						class="btn btn-primary"
+						hx-post="{% url 'create_chat' %}"
+						hx-target="#sidebar"
+						hx-swap="innerHTML"
+					>
+						Create New Chat
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
 </div>
-{% else %}
-<div
-	id="chat-messages"
-	class="flex-1 flex flex-col bg-base-100 shadow-md overflow-y-auto"
->
-	<p class="text-center text-gray-500 mt-8">
-		Select a chat or create a new one to start messaging.
-	</p>
-</div>
-{% endif %}
 
 <script>
 	document.body.addEventListener('htmx:wsAfterMessage', function (event) {
@@ -39,4 +54,20 @@
 			}
 		}
 	});
+
+	// Scroll to bottom of chat messages when new message is added
+	function scrollToBottom() {
+		const chatMessages = document.getElementById('chat-messages');
+		if (chatMessages) {
+			chatMessages.scrollTop = chatMessages.scrollHeight;
+		}
+	}
+
+	document.body.addEventListener('htmx:afterOnLoad', function (event) {
+		if (event.detail.elt.id === 'chat-messages') {
+			scrollToBottom();
+		}
+	});
+
+	document.body.addEventListener('htmx:wsAfterMessage', scrollToBottom);
 </script>
