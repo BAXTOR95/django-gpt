@@ -86,6 +86,10 @@
 						type="checkbox"
 						id="theme-toggle"
 						class="theme-controller"
+						hx-trigger="change"
+						hx-post="/toggle-theme/"
+						hx-post="{% url 'toggle-theme' %}"
+						hx-swap="none"
 						data-toggle-theme="dark,light"
 						data-act-class="ACTIVECLASS"
 					/>
