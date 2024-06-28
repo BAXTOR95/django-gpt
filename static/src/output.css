@@ -2634,12 +2634,32 @@ html:has(.drawer-toggle:checked) {
   position: static;
 }
 
+.fixed {
+  position: fixed;
+}
+
 .sticky {
   position: sticky;
 }
 
+.inset-0 {
+  inset: 0px;
+}
+
 .top-0 {
   top: 0px;
+}
+
+.left-\[max\(0px\2c calc\(50\%-45rem\)\)\] {
+  left: max(0px,calc(50% - 45rem));
+}
+
+.right-auto {
+  right: auto;
+}
+
+.top-\[3\.8125rem\] {
+  top: 3.8125rem;
 }
 
 .z-\[1\] {
@@ -2648,6 +2668,10 @@ html:has(.drawer-toggle:checked) {
 
 .z-40 {
   z-index: 40;
+}
+
+.z-20 {
+  z-index: 20;
 }
 
 .mx-auto {
@@ -2781,6 +2805,10 @@ html:has(.drawer-toggle:checked) {
 
 .w-full {
   width: 100%;
+}
+
+.w-\[19rem\] {
+  width: 19rem;
 }
 
 .min-w-full {
@@ -2995,12 +3023,29 @@ html:has(.drawer-toggle:checked) {
   padding-bottom: 2rem;
 }
 
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .pb-8 {
   padding-bottom: 2rem;
 }
 
 .pt-6 {
   padding-top: 1.5rem;
+}
+
+.pb-10 {
+  padding-bottom: 2.5rem;
+}
+
+.pl-8 {
+  padding-left: 2rem;
+}
+
+.pr-6 {
+  padding-right: 1.5rem;
 }
 
 .text-center {
@@ -3220,9 +3265,18 @@ html:has(.drawer-toggle:checked) {
     padding-left: 0px;
     padding-right: 0px;
   }
+
+  .md\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 @media (min-width: 1024px) {
+  .lg\:block {
+    display: block;
+  }
+
   .lg\:flex {
     display: flex;
   }
