@@ -1,5 +1,5 @@
 {% if current_chat %}
-<div id="message-list" class="flex-1 overflow-y-scroll px-4 py-6 space-y-6">
+<div id="message-list" class="flex-1 px-4 py-6 space-y-6">
 	{% for message in messages %}
 	<div
 		class="chat {% if message.is_user %}chat-end{% else %}chat-start{% endif %}"
