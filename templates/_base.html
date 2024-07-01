@@ -1,4 +1,4 @@
-{% load compress %} {% load static %}
+{% load compress %} {% load static %} {% load custom_filters %}
 
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -63,10 +63,7 @@
 				<div class="dropdown dropdown-end">
 					<label tabindex="0" class="btn btn-ghost btn-circle avatar">
 						<div class="w-10 rounded-full">
-							<img
-								src="https://api.dicebear.com/6.x/initials/svg?seed={{ user.username }}"
-								alt="User avatar"
-							/>
+							<img src="{{ user.email|gravatar_url }}" alt="User avatar" />
 						</div>
 					</label>
 					<ul

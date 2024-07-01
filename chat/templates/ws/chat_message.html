@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 <div id="message-list" hx-swap-oob="beforeend">
 	<div
 		class="chat {% if is_system %}chat-start{% else %}chat-end{% endif %} mt-6"
@@ -11,7 +13,7 @@
 				/>
 				{% else %}
 				<img
-					src="https://api.dicebear.com/6.x/initials/svg?seed={{ user.username }}"
+					src="{{ user.email|gravatar_url }}"
 					alt="User Avatar"
 				/>
 				{% endif %}

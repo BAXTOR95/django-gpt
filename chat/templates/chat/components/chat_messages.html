@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 {% if current_chat %}
 <div id="message-list" class="flex-1 px-4 py-6 space-y-6">
 	{% for message in messages %}
@@ -8,7 +10,7 @@
 			<div class="w-10 rounded-full">
 				{% if message.is_user %}
 				<img
-					src="https://api.dicebear.com/6.x/initials/svg?seed={{ user.username }}"
+					src="{{ user.email|gravatar_url }}"
 					alt="User Avatar"
 				/>
 				{% else %}
