@@ -6,11 +6,14 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>DjangoGPT</title>
+		<title>{% block title %}{% endblock %} - DjangoGPT</title>
 
 		{% compress css %}
 		<link rel="stylesheet" href="{% static 'src/output.css' %}" />
 		{% endcompress %}
+
+		<!-- Extra CSS -->
+		{% block extra_css %}{% endblock extra_css %}
 	</head>
 	<body class="min-h-screen flex flex-col">
 		<div class="sticky top-0 z-40 navbar bg-base-200 shadow-lg">

@@ -1,45 +1,322 @@
 {% extends "_base.html" %}
 
+<!-- Title -->
+{% block title %}Home{% endblock %}
+
+<!-- Extra CSS -->
+{% block extra_css %}
+<style>
+	.fade-in {
+		opacity: 0;
+		transition: opacity 250ms ease-in;
+	}
+	.fade-in.appear {
+		opacity: 1;
+	}
+</style>
+{% endblock %}
+
 <!-- Content -->
 {% block content %}
 
 <!-- Messages -->
 {% if messages %}
-<!-- Loop through messages -->
-{% for message in messages %}
-<div role="alert" class="alert alert-{{ message.tags }}">
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		fill="none"
-		viewBox="0 0 24 24"
-		class="stroke-info h-6 w-6 shrink-0"
-	>
-		<path
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			stroke-width="2"
-			d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-		></path>
-	</svg>
-	{{ message }}
+<div class="toast toast-bottom toast-center z-50">
+	{% for message in messages %}
+	<div class="alert alert-{{ message.tags }}">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			class="stroke-current shrink-0 w-6 h-6"
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+			></path>
+		</svg>
+		<span>{{ message }}</span>
+	</div>
+	{% endfor %}
 </div>
-<!-- End for -->
-{% endfor %}
-<!-- End if -->
 {% endif %}
 
-<!-- Hero -->
+<!-- FAQ button -->
+<div class="fixed bottom-4 right-4 z-50">
+	<a href="#faq" class="btn btn-primary btn-circle">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="h-6 w-6"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke="currentColor"
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+			/>
+		</svg>
+	</a>
+</div>
+
+<!-- Hero Section -->
 <div class="hero min-h-screen bg-base-200">
 	<div class="hero-content text-center">
 		<div class="max-w-md">
 			<h1 class="text-5xl font-bold">Welcome to LLM Hub</h1>
 			<p class="py-6">
-				Chat with different Language Models in one place. Explore the power of
-				AI-driven conversations.
+				Your gateway to AI-powered conversations with multiple Language Models.
 			</p>
-			<a href="{% url 'login' %}" class="btn btn-primary">Get Started</a>
-			<a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
+			<div class="flex justify-center space-x-4">
+				<a href="{% url 'login' %}" class="btn btn-primary">Get Started</a>
+				<a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
+			</div>
 		</div>
 	</div>
 </div>
+
+<!-- Features Section -->
+<section class="py-16 bg-base-100">
+	<div class="container mx-auto px-4">
+		<h2 class="text-3xl font-bold text-center mb-12">Why Choose LLM Hub?</h2>
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+			<div class="card bg-base-200 shadow-xl fade-in">
+				<div class="card-body items-center text-center">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-12 w-12 text-primary"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+						/>
+					</svg>
+					<h3 class="text-xl font-semibold mt-4">Multiple LLM Models</h3>
+					<p class="mt-2">
+						Access various AI models in one place, tailored to your needs.
+					</p>
+				</div>
+			</div>
+			<div class="card bg-base-200 shadow-xl fade-in">
+				<div class="card-body items-center text-center">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-12 w-12 text-primary"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+						/>
+					</svg>
+					<h3 class="text-xl font-semibold mt-4">Secure & Private</h3>
+					<p class="mt-2">
+						Your conversations and API keys are kept safe and secure.
+					</p>
+				</div>
+			</div>
+			<div class="card bg-base-200 shadow-xl fade-in">
+				<div class="card-body items-center text-center">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-12 w-12 text-primary"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M13 10V3L4 14h7v7l9-11h-7z"
+						/>
+					</svg>
+					<h3 class="text-xl font-semibold mt-4">Real-time Responses</h3>
+					<p class="mt-2">
+						Experience lightning-fast, real-time AI interactions.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-16 bg-base-200">
+	<div class="container mx-auto px-4">
+		<h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
+		<div class="steps steps-vertical lg:steps-horizontal">
+			<div class="step step-primary">
+				<div class="step-circle">1</div>
+				<h3 class="mt-4 font-semibold">Sign Up</h3>
+				<p class="mt-2">Create your free account to get started.</p>
+			</div>
+			<div class="step step-primary">
+				<div class="step-circle">2</div>
+				<h3 class="mt-4 font-semibold">Add Your API Key</h3>
+				<p class="mt-2">Enter your OpenAI API key in your profile settings.</p>
+			</div>
+			<div class="step step-primary">
+				<div class="step-circle">3</div>
+				<h3 class="mt-4 font-semibold">Choose Your Model</h3>
+				<p class="mt-2">Select from various LLM models for your chat.</p>
+			</div>
+			<div class="step step-primary">
+				<div class="step-circle">4</div>
+				<h3 class="mt-4 font-semibold">Start Chatting</h3>
+				<p class="mt-2">Enjoy AI-powered conversations!</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-base-100">
+	<div class="container mx-auto px-4">
+		<div class="card bg-primary text-primary-content">
+			<div class="card-body text-center">
+				<h2 class="card-title text-3xl font-bold justify-center">
+					Ready to explore the world of AI?
+				</h2>
+				<p class="mt-4">
+					Join LLM Hub today and unlock the power of multiple language models.
+				</p>
+				<div class="card-actions justify-center mt-6">
+					<a href="{% url 'register' %}" class="btn btn-secondary btn-lg"
+						>Sign Up Now</a
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-16 bg-base-200" x-data="{ activeTab: 0 }">
+	<div class="container mx-auto px-4">
+		<h2 class="text-3xl font-bold text-center mb-12">
+			Frequently Asked Questions
+		</h2>
+		<div class="join join-vertical w-full">
+			<div class="collapse collapse-arrow join-item border border-base-300">
+				<input type="radio" name="my-accordion-4" checked="checked" />
+				<div class="collapse-title text-xl font-medium">What is LLM Hub?</div>
+				<div class="collapse-content">
+					<p>
+						LLM Hub is a platform that allows you to chat with various Large
+						Language Models (LLMs) in one place. It provides a unified interface
+						to interact with different AI models, making it easy to explore and
+						utilize their capabilities.
+					</p>
+				</div>
+			</div>
+			<div class="collapse collapse-arrow join-item border border-base-300">
+				<input type="radio" name="my-accordion-4" />
+				<div class="collapse-title text-xl font-medium">
+					Do I need an API key to use LLM Hub?
+				</div>
+				<div class="collapse-content">
+					<p>
+						Yes, you'll need to provide your own API key (starting with OpenAI)
+						to use LLM Hub. This ensures that you have control over your usage
+						and billing. You can easily add your API key in your profile
+						settings after registering.
+					</p>
+				</div>
+			</div>
+			<div class="collapse collapse-arrow join-item border border-base-300">
+				<input type="radio" name="my-accordion-4" />
+				<div class="collapse-title text-xl font-medium">
+					Which LLM models are supported?
+				</div>
+				<div class="collapse-content">
+					<p>
+						We currently support OpenAI's models, including GPT-3.5 and GPT-4.
+						We're continuously working on adding support for more models from
+						different providers to give you a wide range of options.
+					</p>
+				</div>
+			</div>
+			<div class="collapse collapse-arrow join-item border border-base-300">
+				<input type="radio" name="my-accordion-4" />
+				<div class="collapse-title text-xl font-medium">Is my data secure?</div>
+				<div class="collapse-content">
+					<p>
+						Yes, we take data security very seriously. Your conversations and
+						API keys are encrypted and stored securely. We do not store or use
+						your data for any purpose other than providing the service to you.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+{% endblock %} {% block extra_js %}
+<script>
+	document.addEventListener('DOMContentLoaded', (event) => {
+		// Smooth scrolling for navigation
+		document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+			anchor.addEventListener('click', function (e) {
+				e.preventDefault();
+				document.querySelector(this.getAttribute('href')).scrollIntoView({
+					behavior: 'smooth',
+				});
+			});
+		});
+
+		// Typing effect for hero title
+		const heroTitle = document.querySelector('.hero h1');
+		const text = heroTitle.textContent;
+		heroTitle.textContent = '';
+		let i = 0;
+		const typeWriter = () => {
+			if (i < text.length) {
+				heroTitle.textContent += text.charAt(i);
+				i++;
+				setTimeout(typeWriter, 100);
+			}
+		};
+		typeWriter();
+
+		// Intersection Observer for fade-in animations
+		const faders = document.querySelectorAll('.fade-in');
+		const appearOptions = {
+			threshold: 0.3,
+			rootMargin: '0px 0px -100px 0px',
+		};
+
+		const appearOnScroll = new IntersectionObserver(function (
+			entries,
+			appearOnScroll,
+		) {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) {
+					return;
+				} else {
+					entry.target.classList.add('appear');
+					appearOnScroll.unobserve(entry.target);
+				}
+			});
+		},
+		appearOptions);
+
+		faders.forEach((fader) => {
+			appearOnScroll.observe(fader);
+		});
+	});
+</script>
 {% endblock %}
