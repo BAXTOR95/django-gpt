@@ -1,21 +1,34 @@
 from django import forms
-from django.contrib.auth.models import User
+from allauth.account.forms import SignupForm
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
 from .models import UserProfile, LLMModel
 
 
-class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Repeat password', widget=forms.PasswordInput)
+class CustomSignupForm(SignupForm):
+    first_name = forms.CharField(max_length=30, label='First Name')
+    last_name = forms.CharField(max_length=30, label='Last Name')
 
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email')
+    def save(self, request):
+        user = super(CustomSignupForm, self).save(request)
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.save()
+        # Create UserProfile
+        UserProfile.objects.get_or_create(user=user)
+        self.send_welcome_email(user)
+        return user
 
-    def clean_password2(self):
-        cd = self.cleaned_data
-        if cd['password'] != cd['password2']:
-            raise forms.ValidationError('Passwords don\'t match.')
-        return cd['password2']
+    def send_welcome_email(self, user):
+        subject = 'Welcome to Our Site'
+        html_message = render_to_string('accounts/welcome_email.html', {'user': user})
+        plain_message = strip_tags(html_message)
+        from_email = settings.EMAIL_HOST_USER
+        to = user.email
+
+        send_mail(subject, plain_message, from_email, [to], html_message=html_message)
 
 
 class UserProfileForm(forms.ModelForm):

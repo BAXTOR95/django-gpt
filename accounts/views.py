@@ -1,54 +1,34 @@
-from django.contrib.auth import login, logout
-from django.contrib.auth.views import LoginView
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
-from django.contrib import messages
-from .forms import UserRegistrationForm, UserProfileForm
+from django.views.generic.edit import UpdateView
+from django.urls import reverse_lazy
 from .models import UserProfile
+from .forms import UserProfileForm
+from django.contrib import messages
+from django.shortcuts import render
+from allauth.account.views import LoginView
+from django.utils.translation import gettext_lazy as _
+from django_ratelimit.decorators import ratelimit
+from django_ratelimit.exceptions import Ratelimited
 
 
-class LoginView(LoginView):
-    template_name = 'accounts/login.html'
-
-    def get_success_url(self):
-        return reverse_lazy('dashboard')
-
-
-@login_required
-def logout_view(request):
-    logout(request)
-    messages.info(request, "Logged out successfully!")
-    return redirect("home")
+class RateLimitedLoginView(LoginView):
+    @ratelimit(key='ip', rate='5/5m', method=['GET', 'POST'], block=True)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 
-class RegisterView(CreateView):
-    form_class = UserRegistrationForm
-    template_name = 'accounts/register.html'
-    success_url = reverse_lazy('dashboard')
-
-    def form_valid(self, form):
-        user = form.save(commit=False)
-        user.set_password(form.cleaned_data['password'])
-        user.save()
-        if not UserProfile.objects.filter(user=user).exists():
-            UserProfile.objects.create(user=user)
-        login(self.request, user)
-        return redirect(self.success_url)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = self.get_form()
-        return context
+def handler403(request, exception=None):
+    if isinstance(exception, Ratelimited):
+        messages.error(request, _("Too many login attempts. Please try again later."))
+        return render(request, "account/login.html", status=403)
+    return render(request, "403.html", status=403)
 
 
 class ProfileView(LoginRequiredMixin, UpdateView):
+    model = UserProfile
     form_class = UserProfileForm
     template_name = 'accounts/profile.html'
     success_url = reverse_lazy('profile')
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         return self.request.user.userprofile

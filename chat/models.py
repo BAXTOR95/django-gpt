@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class LLMModel(models.Model):
@@ -10,7 +11,7 @@ class LLMModel(models.Model):
 
 
 class Chat(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, default="New Chat")
     created_at = models.DateTimeField(auto_now_add=True)
     llm_model = models.ForeignKey(LLMModel, on_delete=models.SET_NULL, null=True)

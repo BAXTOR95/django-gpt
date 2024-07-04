@@ -1,6 +1,13 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from chat.models import LLMModel
+
+
+class User(AbstractUser):
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return self.username
 
 
 class UserProfile(models.Model):
@@ -11,4 +18,4 @@ class UserProfile(models.Model):
     )
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username}'s profile"
