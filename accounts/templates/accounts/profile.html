@@ -1,5 +1,9 @@
 {% extends "_base.html" %}
 {% load custom_filters %}
+<!-- load i18n -->
+{% load i18n %}
+<!-- load crispy_forms_tags -->
+{% load crispy_forms_tags %}
 <!-- Title -->
 {% block title %}
     Profile
@@ -51,6 +55,20 @@
                     <div class="mt-6">
                         <a href="{% url 'account_change_password' %}"
                            class="btn btn-outline btn-secondary w-full">{% trans "Change Password" %}</a>
+                    </div>
+                    <div class="mt-6">
+                        {% if has_2fa %}
+                            <p class="text-success">{% trans "Two-factor authentication is enabled." %}</p>
+                            <a href="{% url 'two_factor:disable' %}"
+                               class="btn btn-outline btn-warning w-full mt-2">
+                                {% trans "Disable Two-Factor Authentication" %}
+                            </a>
+                        {% else %}
+                            <a href="{% url 'two_factor:setup' %}"
+                               class="btn btn-outline btn-secondary w-full">
+                                {% trans "Enable Two-Factor Authentication" %}
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
