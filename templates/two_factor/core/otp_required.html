@@ -1,0 +1,39 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+{% block head_title %}
+  {% trans "Permission Denied" %}
+{% endblock head_title %}
+{% block content %}
+  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+        <div class="card-body">
+          <h1 class="text-2xl font-bold text-center">
+            {% block title %}
+              {% trans "Permission Denied" %}
+            {% endblock title %}
+          </h1>
+          <p class="mt-4 text-center">
+            {% blocktrans trimmed %}
+              The page you requested enforces users to verify using
+              two-factor authentication for security reasons. You need to enable these
+              security features in order to access this page.
+            {% endblocktrans %}
+          </p>
+          <p class="mt-4 text-center">
+            {% blocktrans trimmed %}
+              Two-factor authentication is not enabled for your
+              account. Enable two-factor authentication for enhanced account
+              security.
+            {% endblocktrans %}
+          </p>
+          <div class="flex justify-between items-center mt-6">
+            <a href="#" onclick="window.history.back();"
+               class="btn btn-link text-primary hover:underline">{% trans "Go back" %}</a>
+            <a href="{% url 'two_factor:setup' %}" class="btn btn-primary">{% trans "Enable Two-Factor Authentication" %}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

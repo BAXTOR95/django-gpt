@@ -1,0 +1,48 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load custom_filters %}
+{% block head_title %}
+    {% trans "Verify Your Email Address" %}
+{% endblock head_title %}
+{% block extra_css %}
+    <style>
+        .verification-sent-container {
+            background-image: url('{{ "email"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="verification-sent-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Verify Your Email Address" %}</h1>
+                    <div class="alert alert-info shadow-lg mt-6">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 class="stroke-current flex-shrink-0 w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <span>{% blocktrans %}We have sent an email to you for verification. Follow the link provided to finalize the signup process.{% endblocktrans %}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-base-content">
+                        <p>{% trans "If you do not see the verification email in your main inbox, check your spam folder." %}</p>
+                        <p class="mt-2">{% trans "Please contact us if you do not receive the verification email within a few minutes." %}</p>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <a href="{% url 'home' %}" class="btn btn-primary">{% trans "Return to Home" %}</a>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <a href="{% url 'account_email' %}" class="link link-primary">{% trans "Change Email Address" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

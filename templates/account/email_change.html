@@ -1,0 +1,57 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% block head_title %}
+    {% trans "Email Address" %}
+{% endblock head_title %}
+{% block extra_css %}
+    <style>
+        .email-change-container {
+            background-image: url('{{ "technology"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="email-change-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Email Address" %}</h1>
+                    {% if emailaddresses %}
+                        {% if current_emailaddress %}
+                            <p class="mt-4 text-center text-base-content">
+                                {% trans "The following email address is associated with your account:" %}
+                                <a href="mailto:{{ current_emailaddress.email }}"
+                                   class="link link-primary">{{ current_emailaddress.email }}</a>
+                            </p>
+                        {% endif %}
+                        {% if new_emailaddress %}
+                            <p class="mt-4 text-center text-base-content">
+                                {% trans "Your email address is still pending verification:" %}
+                                <a href="mailto:{{ new_emailaddress.email }}" class="link link-primary">{{ new_emailaddress.email }}</a>
+                            </p>
+                            <form method="post" action="{% url 'account_email' %}" class="mt-4">
+                                {% csrf_token %}
+                                <input type="hidden" name="email" value="{{ new_emailaddress.email }}">
+                                <button type="submit" name="action_send" class="btn btn-secondary w-full">{% trans "Re-send Verification" %}</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        {% include "account/snippets/warn_no_email.html" %}
+                    {% endif %}
+                    <h2 class="text-2xl font-bold text-center mt-8">{% trans "Change Email Address" %}</h2>
+                    <form method="post"
+                          action="{% url 'account_email' %}"
+                          class="mt-4 space-y-4">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button name="action_add" type="submit" class="btn btn-primary w-full">{% trans "Change Email" %}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

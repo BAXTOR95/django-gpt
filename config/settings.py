@@ -216,7 +216,7 @@ AUTHENTICATION_BACKENDS = [
 AUTH_USER_MODEL = 'accounts.User'
 
 # Site ID (required for allauth)
-SITE_ID = 1
+SITE_ID = 2
 
 # Email Verification
 
@@ -229,12 +229,14 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # Replace with your email
 EMAIL_HOST_PASSWORD = os.getenv(
     'EMAIL_HOST_PASSWORD'
 )  # Replace with your email password
+DEFAULT_FROM_EMAIL = "info@djangogpt.com"
 
 # AllAuth configuration
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5

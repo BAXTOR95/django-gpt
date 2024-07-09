@@ -1,0 +1,40 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block head_title %}
+  {% trans "Add Backup Phone" %}
+{% endblock head_title %}
+{% block content %}
+  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+        <div class="card-body">
+          <h1 class="text-2xl font-bold text-center">{% trans "Add Backup Phone" %}</h1>
+          {% if wizard.steps.current == 'setup' %}
+            <p class="mt-4 text-center">
+              {% blocktrans trimmed %}
+                You'll be adding a backup phone number to your
+                account. This number will be used if your primary method of
+                registration is not available.
+              {% endblocktrans %}
+            </p>
+          {% elif wizard.steps.current == 'validation' %}
+            <p class="mt-4 text-center">
+              {% blocktrans trimmed %}
+                We've sent a token to your phone number. Please
+                enter the token you've received.
+              {% endblocktrans %}
+            </p>
+          {% endif %}
+          <form action="" method="post" class="mt-8 space-y-6">
+            {% csrf_token %}
+            {% include "two_factor/_wizard_forms.html" %}
+            {# hidden submit button to enable [enter] key #}
+            <input type="submit" value="" hidden />
+            {% include "two_factor/_wizard_actions.html" %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

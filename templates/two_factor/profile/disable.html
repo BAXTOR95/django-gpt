@@ -1,0 +1,21 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+{% block title %}
+  {% trans "Disable Two-Factor Authentication" %}
+{% endblock title %}
+{% block content %}
+  <h1 class="text-2xl font-bold text-center">{% trans "Disable Two-Factor Authentication" %}</h1>
+  <p class="mt-4 text-center">
+    {% blocktrans trimmed %}
+      You are about to disable two-factor authentication. This
+      weakens your account security, are you sure?
+    {% endblocktrans %}
+  </p>
+  <form method="post" class="mt-6 space-y-4">
+    {% csrf_token %}
+    <div class="space-y-4">{{ form|crispy }}</div>
+    <div class="text-center">
+      <button class="btn btn-error w-full" type="submit">{% trans "Disable" %}</button>
+    </div>
+  </form>
+{% endblock content %}

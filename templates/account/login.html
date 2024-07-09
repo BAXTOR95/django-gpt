@@ -1,0 +1,117 @@
+{% extends "_base.html" %}
+<!-- load i18n -->
+{% load i18n %}
+<!-- load account socialaccount -->
+{% load account socialaccount %}
+<!-- load crispy_forms_tags -->
+{% load crispy_forms_tags %}
+<!-- load custom filters -->
+{% load custom_filters %}
+<!-- Title -->
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+<!-- Extra CSS -->
+{% block extra_css %}
+    <style>
+        .login-container {
+            background-image: url('{{ "technology"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+<!-- Content -->
+{% block content %}
+    <div class="login-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Sign In" %}</h1>
+                    {% get_providers as socialaccount_providers %}
+                    {% if socialaccount_providers %}
+                        <p class="text-center mt-4">
+                            {% blocktrans with site.name as site_name %}Please sign in with one of your existing third party accounts. Or, <a href="{{ signup_url }}" class="text-primary hover:underline">sign up</a> for a {{ site_name }} account and sign in below:{% endblocktrans %}
+                        </p>
+                        <div class="socialaccount_ballot space-y-4 mt-4">
+                            <ul class="socialaccount_providers">
+                                {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                            </ul>
+                            <div class="divider">OR</div>
+                        </div>
+                        {% include "socialaccount/snippets/login_extra.html" %}
+                    {% else %}
+                        <p class="text-center mt-4">
+                            {% blocktrans %}If you have not created an account yet, then please <a href="{{ signup_url }}" class="text-primary hover:underline">sign up</a> first.{% endblocktrans %}
+                        </p>
+                    {% endif %}
+                    <form class="login mt-8 space-y-6"
+                          method="post"
+                          action="{% url 'account_login' %}">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        {% if redirect_field_value %}
+                            <input type="hidden"
+                                   name="{{ redirect_field_name }}"
+                                   value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        <div class="flex items-center justify-between">
+                            {% comment %} <div class="flex items-center">
+                                <input id="remember" name="remember" type="checkbox" class="checkbox checkbox-primary">
+                                <label for="remember" class="ml-2 block text-sm text-base-content">{% trans "Remember Me" %}</label>
+                            </div> {% endcomment %}
+                            <div class="text-sm">
+                                <a href="{% url 'account_reset_password' %}"
+                                   class="font-medium text-primary hover:text-primary-focus">
+                                    {% trans "Forgot Password?" %}
+                                </a>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary w-full" type="submit">{% trans "Sign In" %}</button>
+                    </form>
+                    {% if messages %}
+                        <div class="alert alert-error shadow-lg mt-4">
+                            {% for message in messages %}
+                                <div>
+                                    {% if 'Too many login attempts' in message.message %}
+                                        <span id="rate-limit-message">{{ message }}</span>
+                                        <span id="countdown"></span>
+                                    {% else %}
+                                        <span>{{ message }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rateLimitMessage = document.getElementById('rate-limit-message');
+            const countdown = document.getElementById('countdown');
+
+            if (rateLimitMessage) {
+                let timeLeft = 300; // 5 minutes in seconds
+
+                function updateCountdown() {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    countdown.textContent = `Try again in ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        setTimeout(updateCountdown, 1000);
+                    } else {
+                        rateLimitMessage.parentElement.style.display = 'none';
+                    }
+                }
+
+                updateCountdown();
+            }
+        });
+    </script>
+{% endblock extra_js %}

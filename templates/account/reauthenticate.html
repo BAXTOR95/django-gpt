@@ -1,0 +1,56 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% block head_title %}
+  {% trans "Confirm Access" %}
+{% endblock head_title %}
+{% block extra_css %}
+  <style>
+      .reauthenticate-container {
+          background-image: url('{{ "security"|unsplash_image }}');
+          background-size: cover;
+          background-position: center;
+      }
+  </style>
+{% endblock extra_css %}
+{% block content %}
+  <div class="reauthenticate-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+        <div class="card-body">
+          <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Confirm Access" %}</h1>
+          <div class="alert alert-info shadow-lg mt-4">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   class="stroke-current flex-shrink-0 w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                </path>
+              </svg>
+              <span>{% blocktranslate %}To safeguard the security of your account, please enter your password:{% endblocktranslate %}</span>
+            </div>
+          </div>
+          <form class="reauthenticate mt-8 space-y-6"
+                method="post"
+                action="{% url 'account_reauthenticate' %}">
+            {% csrf_token %}
+            {{ form|crispy }}
+            {% if redirect_field_value %}
+              <input type="hidden"
+                     name="{{ redirect_field_name }}"
+                     value="{{ redirect_field_value }}" />
+            {% endif %}
+            <div class="mt-6">
+              <button type="submit" class="btn btn-primary w-full">{% trans "Confirm" %}</button>
+            </div>
+          </form>
+          <div class="mt-4 text-center">
+            <a href="{% url 'account_reset_password' %}" class="link link-primary">{% trans "Forgot Password?" %}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

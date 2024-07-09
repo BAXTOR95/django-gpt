@@ -1,0 +1,6 @@
+{% load crispy_forms_tags %}
+
+<div class="overflow-x-auto mb-6">
+  {{ wizard.management_form }}
+  <div class="mb-4">{{ wizard.form|crispy }}</div>
+</div>

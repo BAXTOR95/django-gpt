@@ -1,0 +1,39 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load custom_filters %}
+{% block head_title %}
+  {% trans "Sign Out" %}
+{% endblock head_title %}
+{% block extra_css %}
+  <style>
+      .logout-container {
+          background-image: url('{{ "technology"|unsplash_image }}');
+          background-size: cover;
+          background-position: center;
+      }
+  </style>
+{% endblock extra_css %}
+{% block content %}
+  <div class="logout-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+        <div class="card-body">
+          <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Sign Out" %}</h1>
+          <p class="mt-4 text-center text-base-content">{% trans "Are you sure you want to sign out?" %}</p>
+          <form method="post" action="{% url 'account_logout' %}" class="mt-8">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+              <input type="hidden"
+                     name="{{ redirect_field_name }}"
+                     value="{{ redirect_field_value }}" />
+            {% endif %}
+            <div class="flex justify-center space-x-4">
+              <button type="submit" class="btn btn-primary">{% trans "Sign Out" %}</button>
+              <a href="{% url 'home' %}" class="btn btn-outline">{% trans "Cancel" %}</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

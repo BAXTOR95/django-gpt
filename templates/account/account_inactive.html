@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load custom_filters %}
+{% block head_title %}
+    {% trans "Account Inactive" %}
+{% endblock head_title %}
+{% block extra_css %}
+    <style>
+        .account-inactive-container {
+            background-image: url('{{ "technology"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="account-inactive-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Account Inactive" %}</h1>
+                    <p class="mt-4 text-center text-base-content">{% trans "This account is inactive." %}</p>
+                    <div class="mt-6">
+                        <a href="{% url 'account_login' %}" class="btn btn-primary w-full">{% trans "Back to Login" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

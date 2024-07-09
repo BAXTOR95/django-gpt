@@ -1,0 +1,94 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% block head_title %}
+  {% trans "Email Addresses" %}
+{% endblock head_title %}
+{% block extra_css %}
+  <style>
+      .email-container {
+          background-image: url('{{ "technology"|unsplash_image }}');
+          background-size: cover;
+          background-position: center;
+      }
+  </style>
+{% endblock extra_css %}
+{% block content %}
+  <div class="email-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+        <div class="card-body">
+          <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Email Addresses" %}</h1>
+          {% if emailaddresses %}
+            <p class="mt-4 text-center text-base-content">
+              {% trans "The following email addresses are associated with your account:" %}
+            </p>
+            <form action="{% url 'account_email' %}"
+                  class="mt-6 space-y-4"
+                  method="post">
+              {% csrf_token %}
+              <fieldset>
+                {% for emailaddress in emailaddresses %}
+                  <div class="form-control">
+                    <label class="label cursor-pointer justify-start space-x-3">
+                      <input type="radio"
+                             name="email"
+                             class="radio radio-primary"
+                             id="email_radio_{{ forloop.counter }}"
+                             {% if emailaddress.primary or emailaddresses|length == 1 %}checked="checked"{% endif %}
+                             value="{{ emailaddress.email }}" />
+                      <span class="label-text">
+                        {{ emailaddress.email }}
+                        {% if emailaddress.verified %}
+                          <span class="badge badge-success ml-2">{% trans "Verified" %}</span>
+                        {% else %}
+                          <span class="badge badge-warning ml-2">{% trans "Unverified" %}</span>
+                        {% endif %}
+                        {% if emailaddress.primary %}
+                          <span class="badge badge-info ml-2">{% trans "Primary" %}</span>
+                        {% endif %}
+                      </span>
+                    </label>
+                  </div>
+                {% endfor %}
+              </fieldset>
+              <div class="flex flex-col space-y-2">
+                <button class="btn btn-secondary" type="submit" name="action_primary">{% trans "Make Primary" %}</button>
+                <button class="btn btn-accent" type="submit" name="action_send">{% trans "Re-send Verification" %}</button>
+                <button class="btn btn-error" type="submit" name="action_remove">{% trans "Remove" %}</button>
+              </div>
+            </form>
+          {% else %}
+            {% include "account/snippets/warn_no_email.html" %}
+          {% endif %}
+          {% if can_add_email %}
+            <h2 class="text-2xl font-bold text-center mt-8">{% trans "Add Email Address" %}</h2>
+            <form method="post"
+                  action="{% url 'account_email' %}"
+                  class="mt-4 space-y-4">
+              {% csrf_token %}
+              {{ form|crispy }}
+              <button name="action_add" type="submit" class="btn btn-primary w-full">{% trans "Add Email" %}</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+{% block extra_body %}
+  <script type="text/javascript">
+      (function() {
+          var message = "{% trans 'Do you really want to remove the selected email address?' %}";
+          var actions = document.getElementsByName('action_remove');
+          if (actions.length) {
+              actions[0].addEventListener("click", function(e) {
+                  if (!confirm(message)) {
+                      e.preventDefault();
+                  }
+              });
+          }
+      })();
+  </script>
+{% endblock extra_body %}

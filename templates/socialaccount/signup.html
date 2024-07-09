@@ -1,0 +1,54 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block head_title %}
+  {% trans "Sign Up" %}
+{% endblock head_title %}
+{% block extra_css %}
+  <style>
+      .social-signup-container {
+          background-image: url('{{ "signup"|unsplash_image }}');
+          background-size: cover;
+          background-position: center;
+      }
+  </style>
+{% endblock extra_css %}
+{% block content %}
+  <div class="social-signup-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+        <div class="card-body">
+          <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Sign Up" %}</h1>
+          <div class="alert alert-info shadow-lg mt-6">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   class="stroke-current flex-shrink-0 w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                </path>
+              </svg>
+              <span>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to {{site_name}}. As a final step, please complete the following form:{% endblocktrans %}</span>
+            </div>
+          </div>
+          <form class="signup mt-8 space-y-6"
+                id="signup_form"
+                method="post"
+                action="{% url 'socialaccount_signup' %}">
+            {% csrf_token %}
+            {{ form|crispy }}
+            {% if redirect_field_value %}
+              <input type="hidden"
+                     name="{{ redirect_field_name }}"
+                     value="{{ redirect_field_value }}" />
+            {% endif %}
+            <button type="submit" class="btn btn-primary w-full">{% trans "Sign Up" %} »</button>
+          </form>
+          <div class="mt-4 text-center">
+            <a href="{% url 'account_login' %}" class="link link-primary">{% trans "Back to login options" %}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

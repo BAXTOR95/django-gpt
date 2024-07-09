@@ -1,0 +1,51 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load account %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% block head_title %}
+    {% trans "Confirm Email Address" %}
+{% endblock head_title %}
+{% block extra_css %}
+    <style>
+        .confirm-email-container {
+            background-image: url('{{ "technology"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="confirm-email-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Confirm Email Address" %}</h1>
+                    {% if confirmation %}
+                        {% user_display confirmation.email_address.user as user_display %}
+                        {% if can_confirm %}
+                            <p class="mt-4 text-center text-base-content">
+                                {% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}" class="link link-primary">{{ email }}</a> is an email address for user {{ user_display }}.{% endblocktrans %}
+                            </p>
+                            <form method="post"
+                                  action="{% url 'account_confirm_email' confirmation.key %}"
+                                  class="mt-4">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary w-full">{% trans "Confirm" %}</button>
+                            </form>
+                        {% else %}
+                            <p class="mt-4 text-center text-base-content">
+                                {% blocktrans %}Unable to confirm {{ email }} because it is already confirmed by a different account.{% endblocktrans %}
+                            </p>
+                        {% endif %}
+                    {% else %}
+                        {% url 'account_email' as email_url %}
+                        <p class="mt-4 text-center text-base-content">
+                            {% blocktrans %}This email confirmation link expired or is invalid. Please <a href="{{ email_url }}" class="link link-primary">issue a new email confirmation request</a>.{% endblocktrans %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
