@@ -7,11 +7,11 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = [
+            'openai_api_key',
+            'preferred_model',
             'bio',
             'location',
             'birth_date',
-            'openai_api_key',
-            'preferred_model',
         ]
 
 

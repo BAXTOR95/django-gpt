@@ -1,0 +1,50 @@
+{% extends "_base.html" %}
+{% load i18n allauth %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+{% block extra_css %}
+    <style>
+        .mfa-authenticate-container {
+            background-image: url('{{ "security"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="mfa-authenticate-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Two-Factor Authentication" %}</h1>
+                    <div class="alert alert-info shadow-lg mt-6">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 class="stroke-current flex-shrink-0 w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <span>{% blocktranslate %}Your account is protected by two-factor authentication. Please enter an authenticator code:{% endblocktranslate %}</span>
+                        </div>
+                    </div>
+                    <form method="post"
+                          action="{% url 'mfa_authenticate' %}"
+                          class="mt-8 space-y-6">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="flex flex-col space-y-4">
+                            <button type="submit" class="btn btn-primary w-full">{% trans "Sign In" %}</button>
+                            <a href="{% url 'account_login' %}"
+                               class="btn btn-outline btn-secondary w-full">{% trans "Cancel" %}</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

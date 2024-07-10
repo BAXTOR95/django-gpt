@@ -1,0 +1,54 @@
+{% extends "mfa/recovery_codes/base.html" %}
+{% load i18n %}
+{% load allauth %}
+{% load custom_filters %}
+{% block extra_css %}
+    <style>
+        .mfa-recovery-codes-container {
+            background-image: url('{{ "security"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="mfa-recovery-codes-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% translate "Recovery Codes" %}</h1>
+                    <div class="alert alert-info shadow-lg mt-6">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 class="stroke-current flex-shrink-0 w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <span>
+                                {% blocktranslate count unused_count=unused_codes|length %}There is {{ unused_count }} out of {{ total_count }} recovery codes available.{% plural %}There are {{ unused_count }} out of {{ total_count }} recovery codes available.{% endblocktranslate %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-control mt-6">
+                        <label class="label">
+                            <span class="label-text">{% translate "Unused codes" %}</span>
+                        </label>
+                        <textarea class="textarea textarea-bordered h-24" readonly rows="{{ unused_codes|length }}">{% for code in unused_codes %}{% if forloop.counter0 %}
+{% endif %}{{ code }}{% endfor %}</textarea>
+                    </div>
+                    <div class="flex flex-col space-y-4 mt-6">
+                        {% if unused_codes %}
+                            <a href="{% url 'mfa_download_recovery_codes' %}"
+                               class="btn btn-primary w-full">{% translate "Download codes" %}</a>
+                        {% endif %}
+                        <a href="{% url 'mfa_generate_recovery_codes' %}"
+                           class="btn btn-secondary w-full">{% translate "Generate new codes" %}</a>
+                        <a href="{% url 'mfa_index' %}" class="btn btn-outline w-full">{% translate "Back to MFA Management" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

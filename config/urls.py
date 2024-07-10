@@ -9,7 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('chat/', include('chat.urls')),
     path('accounts/', include('allauth.urls')),
-    path('accounts/', include('allauth.mfa.urls')),
     path('accounts/', include('accounts.urls')),
     path('__reload__/', include('django_browser_reload.urls')),
 ]

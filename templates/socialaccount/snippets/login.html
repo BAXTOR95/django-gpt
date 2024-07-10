@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load allauth %}
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+{% if socialaccount_providers %}
+    {% if not SOCIALACCOUNT_ONLY %}
+        <div class="divider my-6">{% translate "Or use a third-party" %}</div>
+    {% endif %}
+    <div class="mt-6 space-y-4">{% include "socialaccount/snippets/provider_list.html" with process="login" %}</div>
+    <div class="mt-4">{% include "socialaccount/snippets/login_extra.html" %}</div>
+{% endif %}

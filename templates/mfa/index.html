@@ -1,0 +1,97 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load allauth %}
+{% load custom_filters %}
+{% block head_title %}
+    {% trans "Two-Factor Authentication" %}
+{% endblock head_title %}
+{% block extra_css %}
+    <style>
+        .mfa-container {
+            background-image: url('{{ "security"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="mfa-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Two-Factor Authentication" %}</h1>
+                    {% if "totp" in MFA_SUPPORTED_TYPES %}
+                        <div class="mt-6">
+                            <h2 class="text-2xl font-bold mb-2">{% trans "Authenticator App" %}</h2>
+                            <div class="alert
+                                        {% if authenticators.totp %}
+                                            alert-success
+                                        {% else %}
+                                            alert-warning
+                                        {% endif %}
+                                        shadow-lg">
+                                <div>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="stroke-current flex-shrink-0 h-6 w-6"
+                                         fill="none"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>
+                                        {% if authenticators.totp %}
+                                            {% trans "Authentication using an authenticator app is active." %}
+                                        {% else %}
+                                            {% trans "An authenticator app is not active." %}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                {% if authenticators.totp %}
+                                    <a href="{% url 'mfa_deactivate_totp' %}" class="btn btn-error">{% trans "Deactivate" %}</a>
+                                {% else %}
+                                    <a href="{% url 'mfa_activate_totp' %}" class="btn btn-primary">{% trans "Activate" %}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if "recovery_codes" in MFA_SUPPORTED_TYPES %}
+                        {% with total_count=authenticators.recovery_codes.generate_codes|length unused_count=authenticators.recovery_codes.get_unused_codes|length %}
+                            <div class="mt-6">
+                                <h2 class="text-2xl font-bold mb-2">{% trans "Recovery Codes" %}</h2>
+                                <div class="alert alert-info shadow-lg">
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             class="stroke-current flex-shrink-0 w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                            </path>
+                                        </svg>
+                                        <span>
+                                            {% if authenticators.recovery_codes %}
+                                                {% blocktranslate count unused_count=unused_count %}There is {{ unused_count }} out of {{ total_count }} recovery codes available.{% plural %}There are {{ unused_count }} out of {{ total_count }} recovery codes available.{% endblocktranslate %}
+                                            {% else %}
+                                                {% trans "No recovery codes set up." %}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if is_mfa_enabled %}
+                                    <div class="mt-4 space-x-2">
+                                        {% if authenticators.recovery_codes and unused_count > 0 %}
+                                            <a href="{% url 'mfa_view_recovery_codes' %}" class="btn btn-primary">{% trans "View" %}</a>
+                                            <a href="{% url 'mfa_download_recovery_codes' %}"
+                                               class="btn btn-secondary">{% trans "Download" %}</a>
+                                        {% endif %}
+                                        <a href="{% url 'mfa_generate_recovery_codes' %}" class="btn btn-accent">{% trans "Generate" %}</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endwith %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

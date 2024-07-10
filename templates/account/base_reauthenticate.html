@@ -1,29 +1,25 @@
 {% extends "_base.html" %}
 {% load i18n %}
 {% load allauth %}
-{% load account %}
 {% load custom_filters %}
 {% block head_title %}
-    {% trans "Password Reset" %}
+    {% trans "Confirm Access" %}
 {% endblock head_title %}
 {% block extra_css %}
     <style>
-        .password-reset-done-container {
-            background-image: url('{{ "technology"|unsplash_image }}');
+        .reauthenticate-container {
+            background-image: url('{{ "security"|unsplash_image }}');
             background-size: cover;
             background-position: center;
         }
     </style>
 {% endblock extra_css %}
 {% block content %}
-    <div class="password-reset-done-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="reauthenticate-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
                 <div class="card-body">
-                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Password Reset" %}</h1>
-                    {% if user.is_authenticated %}
-                        {% include "account/snippets/already_logged_in.html" %}
-                    {% endif %}
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Confirm Access" %}</h1>
                     <div class="alert alert-info shadow-lg mt-6">
                         <div>
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -33,12 +29,23 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                 </path>
                             </svg>
-                            <span>{% blocktrans %}We have sent you an email. If you have not received it please check your spam folder. Otherwise contact us if you do not receive it in a few minutes.{% endblocktrans %}</span>
+                            <span>{% blocktranslate %}Please reauthenticate to safeguard your account.{% endblocktranslate %}</span>
                         </div>
                     </div>
-                    <div class="mt-6 text-center">
-                        <a href="{% url 'account_login' %}" class="btn btn-primary">{% trans "Back to Login" %}</a>
+                    <div class="mt-6">
+                        {% block reauthenticate_content %}
+                        {% endblock reauthenticate_content %}
                     </div>
+                    {% if reauthentication_alternatives %}
+                        <div class="divider">{% translate "Alternative options" %}</div>
+                        <ul class="menu bg-base-200 w-full rounded-box">
+                            {% for alt in reauthentication_alternatives %}
+                                <li>
+                                    <a href="{{ alt.url }}" class="hover:bg-base-300">{{ alt.description }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
             </div>
         </div>

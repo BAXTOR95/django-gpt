@@ -54,13 +54,7 @@
                     </div>
                     <div class="mt-6">
                         <h2 class="text-xl font-bold mt-8 mb-4">{% trans "Multi-Factor Authentication" %}</h2>
-                        {% comment %} {% if has_mfa %}
-                            <p>{% trans "MFA is enabled for your account." %}</p>
-                            <a href="{% url 'mfa_disable' %}" class="btn btn-warning">{% trans "Disable MFA" %}</a>
-                        {% else %}
-                            <p>{% trans "MFA is not enabled for your account." %}</p>
-                            <a href="{% url 'mfa_setup' %}" class="btn btn-success">{% trans "Enable MFA" %}</a>
-                        {% endif %} {% endcomment %}
+                        <a href="{% url 'mfa_index' %}" class="btn btn-primary w-full">{% trans "Manage MFA" %}</a>
                     </div>
                 </div>
             </div>

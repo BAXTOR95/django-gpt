@@ -1,0 +1,67 @@
+{% extends "mfa/recovery_codes/base.html" %}
+{% load i18n %}
+{% load allauth %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% block extra_css %}
+    <style>
+        .mfa-recovery-codes-container {
+            background-image: url('{{ "security"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="mfa-recovery-codes-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body">
+                    <h1 class="text-3xl font-extrabold text-center w-full">{% translate "Recovery Codes" %}</h1>
+                    <div class="alert
+                                {% if unused_code_count %}
+                                    alert-warning
+                                {% else %}
+                                    alert-info
+                                {% endif %}
+                                shadow-lg mt-6">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 class="stroke-current flex-shrink-0 w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <span>
+                                {% blocktranslate %}You are about to generate a new set of recovery codes for your account.{% endblocktranslate %}
+                                {% if unused_code_count %}
+                                    {% blocktranslate %}This action will invalidate your existing codes.{% endblocktranslate %}
+                                {% endif %}
+                                {% blocktranslate %}Are you sure?{% endblocktranslate %}
+                            </span>
+                        </div>
+                    </div>
+                    <form method="post"
+                          action="{% url 'mfa_generate_recovery_codes' %}"
+                          class="mt-8 space-y-6">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="flex flex-col space-y-4">
+                            <button type="submit"
+                                    class="btn
+                                           {% if unused_code_count %}
+                                               btn-warning
+                                           {% else %}
+                                               btn-primary
+                                           {% endif %}
+                                           w-full">{% trans "Generate" %}</button>
+                            <a href="{% url 'mfa_manage' %}"
+                               class="btn btn-outline btn-secondary w-full">{% trans "Cancel" %}</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

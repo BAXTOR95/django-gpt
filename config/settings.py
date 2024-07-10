@@ -218,7 +218,7 @@ AUTHENTICATION_BACKENDS = [
 AUTH_USER_MODEL = 'accounts.User'
 
 # Site ID (required for allauth)
-SITE_ID = 2
+SITE_ID = 3
 
 # Email Verification
 
@@ -260,10 +260,7 @@ ACCOUNT_FORMS = {
 }
 
 # MFA settings
-ALLAUTH_MFA_ENABLED = True
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'  # Required for QR code generation
-ALLAUTH_MFA_SETUP_ENDPOINT = '/accounts/mfa/setup/'
-ALLAUTH_MFA_VERIFY_ENDPOINT = '/accounts/mfa/verify/'
+MFA_ADAPTER = "allauth.mfa.adapter.DefaultMFAAdapter"
 
 # Email backend (for development)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

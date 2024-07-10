@@ -1,15 +1,11 @@
 {% extends "_base.html" %}
-<!-- load i18n -->
 {% load i18n %}
-{% load custom_filters %}
-<!-- load crispy_forms_tags -->
-{% load crispy_forms_tags %}
 {% load allauth account socialaccount %}
-<!-- Title -->
+{% load crispy_forms_tags %}
+{% load custom_filters %}
 {% block head_title %}
     {% trans "Signup" %}
 {% endblock head_title %}
-<!-- Extra CSS -->
 {% block extra_css %}
     <style>
         .register-container {
@@ -19,7 +15,6 @@
         }
     </style>
 {% endblock extra_css %}
-<!-- Content -->
 {% block content %}
     <div class="register-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
@@ -27,30 +22,27 @@
                 <div class="card-body">
                     <h1 class="text-3xl font-extrabold text-center w-full">{% trans "Sign Up" %}</h1>
                     <p class="text-center mt-4">
+                        {% url 'account_login' as login_url %}
                         {% blocktrans %}Already have an account? Then please <a href="{{ login_url }}" class="text-primary hover:underline">sign in</a>.{% endblocktrans %}
                     </p>
-                    {% get_providers as socialaccount_providers %}
-                    {% if socialaccount_providers %}
-                        <div class="socialaccount_ballot space-y-4 mt-4">
-                            <ul class="socialaccount_providers">
-                                {% include "socialaccount/snippets/provider_list.html" with process="signup" %}
-                            </ul>
-                            <div class="divider">OR</div>
-                        </div>
+                    {% if not SOCIALACCOUNT_ONLY %}
+                        <form class="signup mt-8 space-y-6"
+                              id="signup_form"
+                              method="post"
+                              action="{% url 'account_signup' %}">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            {% if redirect_field_value %}
+                                <input type="hidden"
+                                       name="{{ redirect_field_name }}"
+                                       value="{{ redirect_field_value }}" />
+                            {% endif %}
+                            <button class="btn btn-primary w-full" type="submit">{% trans "Sign Up" %}</button>
+                        </form>
                     {% endif %}
-                    <form class="signup mt-8 space-y-6"
-                          id="signup_form"
-                          method="post"
-                          action="{% url 'account_signup' %}">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        {% if redirect_field_value %}
-                            <input type="hidden"
-                                   name="{{ redirect_field_name }}"
-                                   value="{{ redirect_field_value }}" />
-                        {% endif %}
-                        <button class="btn btn-primary w-full" type="submit">{% trans "Sign Up" %}</button>
-                    </form>
+                    {% if SOCIALACCOUNT_ENABLED %}
+                        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+                    {% endif %}
                 </div>
             </div>
         </div>

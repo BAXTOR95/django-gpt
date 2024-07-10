@@ -1,0 +1,42 @@
+{% extends "_base.html" %}
+{% load i18n allauth %}
+{% block head_title %}
+    {% translate "Sign In" %} | {{ provider }}
+{% endblock head_title %}
+{% block extra_head %}
+    <meta http-equiv="refresh" content="0;URL='{{ redirect_to }}'" />
+{% endblock extra_head %}
+{% block extra_css %}
+    <style>
+        .redirect-container {
+            background-image: url('{{ "connect"|unsplash_image }}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock extra_css %}
+{% block content %}
+    <div class="redirect-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="card bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div class="card-body text-center">
+                    <h1 class="text-3xl font-extrabold mb-4">{% translate "Redirecting..." %}</h1>
+                    <div class="alert alert-info shadow-lg">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 class="stroke-current flex-shrink-0 w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <span>{% translate "You are being redirected to complete the sign-in process." %}</span>
+                        </div>
+                    </div>
+                    <p class="mt-4">{% translate "If you are not redirected automatically, please click the button below:" %}</p>
+                    <a href="{{ redirect_to }}" class="btn btn-primary mt-4">{% translate "Continue" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

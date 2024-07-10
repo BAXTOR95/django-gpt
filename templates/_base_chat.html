@@ -1,47 +1,67 @@
-{% load compress %} {% load static %}
-
+{% load i18n allauth %}
+{% load compress %}
+{% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>{% block head_title %}{% endblock head_title %} - DjangoGPT</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Django GPT." />
+        <meta name="keywords" content="Django, ChatGPT" />
+        <title>
+            {% block head_title %}
+                {% block title %}
+                {% endblock title %}
+            {% endblock head_title %}
+        - DjangoGPT</title>
+        {% block extra_head %}
+        {% endblock extra_head %}
+        {% compress css %}
+            <link rel="stylesheet" href="{% static 'src/output.css' %}" />
+        {% endcompress %}
+        <!-- Extra CSS -->
+        {% block extra_css %}
+        {% endblock extra_css %}
+        {% block extra_media %}
+        {% endblock extra_media %}
+    </head>
+    <body class="min-h-screen flex flex-col">
+        {% block body %}
+            <main class="flex-grow">
+                {% block content %}
+                {% endblock content %}
+            </main>
+            {% compress js %}
+                <script type="text/javascript" src="{% static 'src/htmx.js' %}"></script>
+                <script type="text/javascript" src="{% static 'src/ws.js' %}"></script>
+            {% endcompress %}
+            <script>
+                const themeToggle = document.getElementById('theme-toggle');
 
-		{% compress css %}
-		<link rel="stylesheet" href="{% static 'src/output.css' %}" />
-		{% endcompress %}
-	</head>
-	<body class="min-h-screen flex flex-col">
-		<main class="flex-grow">{% block content %}{% endblock content %}</main>
+                function setTheme(theme) {
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    themeToggle.checked = theme === 'dark';
+                }
 
-		{% compress js %}
-		<script type="text/javascript" src="{% static 'src/htmx.js' %}"></script>
-		<script type="text/javascript" src="{% static 'src/ws.js' %}"></script>
-		{% endcompress %}
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                setTheme(savedTheme);
 
-		<script>
-			const themeToggle = document.getElementById('theme-toggle');
+                themeToggle.addEventListener('change', () => {
+                    const newTheme = themeToggle.checked ? 'dark' : 'light';
+                    setTheme(newTheme);
+                });
 
-			function setTheme(theme) {
-				document.documentElement.setAttribute('data-theme', theme);
-				localStorage.setItem('theme', theme);
-				themeToggle.checked = theme === 'dark';
-			}
-
-			const savedTheme = localStorage.getItem('theme') || 'light';
-			setTheme(savedTheme);
-
-			themeToggle.addEventListener('change', () => {
-				const newTheme = themeToggle.checked ? 'dark' : 'light';
-				setTheme(newTheme);
-			});
-
-			document.body.addEventListener('htmx:configRequest', (event) => {
-				event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-			});
-		</script>
-
-		{% block extra_js %}{% endblock extra_js %}
-	</body>
+                document.body.addEventListener('htmx:configRequest', (event) => {
+                    event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+                });
+            </script>
+            {% block extra_body %}
+            {% endblock extra_body %}
+            {% block extra_js %}
+            {% endblock extra_js %}
+        {% endblock body %}
+    </body>
 </html>
