@@ -50,8 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'crispy_forms',
-    'crispy_tailwind',
     'channels',
     'core',
     'accounts',
@@ -264,10 +262,6 @@ MFA_ADAPTER = "allauth.mfa.adapter.DefaultMFAAdapter"
 
 # Email backend (for development)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# Crispy Forms
-CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
-CRISPY_TEMPLATE_PACK = "tailwind"
 
 # Session configuration for "Remember Me" functionality
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
