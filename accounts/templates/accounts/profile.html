@@ -33,7 +33,7 @@
                                  height="96" />
                         </div>
                     </div>
-                    <form method="post" class="mt-8 space-y-6">
+                    <form method="post" class="mt-4 space-y-6">
                         {% csrf_token %}
                         {{ form|crispy }}
                         <div>
@@ -53,22 +53,14 @@
                         </p>
                     </div>
                     <div class="mt-6">
-                        <a href="{% url 'account_change_password' %}"
-                           class="btn btn-outline btn-secondary w-full">{% trans "Change Password" %}</a>
-                    </div>
-                    <div class="mt-6">
-                        {% if has_2fa %}
-                            <p class="text-success">{% trans "Two-factor authentication is enabled." %}</p>
-                            <a href="{% url 'two_factor:disable' %}"
-                               class="btn btn-outline btn-warning w-full mt-2">
-                                {% trans "Disable Two-Factor Authentication" %}
-                            </a>
+                        <h2 class="text-xl font-bold mt-8 mb-4">{% trans "Multi-Factor Authentication" %}</h2>
+                        {% comment %} {% if has_mfa %}
+                            <p>{% trans "MFA is enabled for your account." %}</p>
+                            <a href="{% url 'mfa_disable' %}" class="btn btn-warning">{% trans "Disable MFA" %}</a>
                         {% else %}
-                            <a href="{% url 'two_factor:setup' %}"
-                               class="btn btn-outline btn-secondary w-full">
-                                {% trans "Enable Two-Factor Authentication" %}
-                            </a>
-                        {% endif %}
+                            <p>{% trans "MFA is not enabled for your account." %}</p>
+                            <a href="{% url 'mfa_setup' %}" class="btn btn-success">{% trans "Enable MFA" %}</a>
+                        {% endif %} {% endcomment %}
                     </div>
                 </div>
             </div>

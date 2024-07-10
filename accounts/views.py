@@ -1,19 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import UpdateView
 from django.urls import reverse_lazy
-from .models import UserProfile
+from .models import User, UserProfile
 from .forms import UserProfileForm
-from django.contrib import messages
-from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
-from django_ratelimit.exceptions import Ratelimited
-from django_otp import user_has_device
-from allauth.account.views import LoginView as AllAuthLoginView
-from two_factor.views import LoginView as TwoFactorLoginView
+from allauth.account.views import PasswordChangeView
 
-
-class CustomLoginView(AllAuthLoginView, TwoFactorLoginView):
-    template_name = 'allauth/account/login.html'
 
 
 class ProfileView(LoginRequiredMixin, UpdateView):
@@ -27,5 +19,11 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['has_2fa'] = user_has_device(self.request.user)
+        # context['has_mfa'] = User.objects.filter(
+        #     pk=self.request.user.pk, mfadevices__isnull=False
+        # ).exists()
         return context
+
+
+class CustomPasswordChangeView(PasswordChangeView):
+    success_url = reverse_lazy('profile')

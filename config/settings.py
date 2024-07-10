@@ -38,23 +38,20 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'daphne',
     'django.contrib.admin',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    'allauth.mfa',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.github',
     'crispy_forms',
     'crispy_tailwind',
-    'django_otp',
-    'django_otp.plugins.otp_static',
-    'django_otp.plugins.otp_totp',
-    'two_factor',
     'channels',
     'core',
     'accounts',
@@ -70,7 +67,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
@@ -153,6 +149,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# Media files (user-uploaded files)
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -177,6 +179,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
         'file': {
@@ -185,11 +188,10 @@ LOGGING = {
         },
     },
     'loggers': {
-        'ratelimit': {
-            'handlers': ['console', 'file'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
+        'two_factor': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
     },
     'root': {
         'handlers': ['console'],
@@ -209,8 +211,8 @@ UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS_KEY')
 
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
-    'accounts.auth_backends.TwoFactorAllAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -229,7 +231,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # Replace with your email
 EMAIL_HOST_PASSWORD = os.getenv(
     'EMAIL_HOST_PASSWORD'
 )  # Replace with your email password
-DEFAULT_FROM_EMAIL = "info@djangogpt.com"
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 
 # AllAuth configuration
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
@@ -239,18 +241,29 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
-ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 300  # 5 minutes in seconds
 ACCOUNT_USERNAME_MIN_LENGTH = 4
-LOGIN_URL = 'two_factor:login'
-LOGIN_REDIRECT_URL = 'two_factor:profile'
+LOGIN_URL = '/accounts/login/'
 LOGOUT_REDIRECT_URL = 'home'
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/accounts/email/'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
+
+ACCOUNT_FORMS = {
+    'signup': 'accounts.forms.CustomSignupForm',
+}
+
+# MFA settings
+ALLAUTH_MFA_ENABLED = True
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'  # Required for QR code generation
+ALLAUTH_MFA_SETUP_ENDPOINT = '/accounts/mfa/setup/'
+ALLAUTH_MFA_VERIFY_ENDPOINT = '/accounts/mfa/verify/'
 
 # Email backend (for development)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -283,6 +296,3 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
     },
 }
-
-# Two-factor auth settings
-TWO_FACTOR_PATCH_ADMIN = True

@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import CustomLoginView, ProfileView
-from .two_factor_custom import CustomSetupView
+from .views import ProfileView, CustomPasswordChangeView
+from allauth.account.views import EmailView
 
 urlpatterns = [
-    path('login/', CustomLoginView.as_view(), name='account_login'),
     path('profile/', ProfileView.as_view(), name='profile'),
-    path('two_factor/setup/', CustomSetupView.as_view(), name='two_factor_setup'),
+    path('email/', EmailView.as_view(), name='account_email'),
+    path('password/change/', CustomPasswordChangeView.as_view(), name='account_change_password'),
 ]
