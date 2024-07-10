@@ -1,7 +1,6 @@
 {% extends "_base.html" %}
 {% load i18n %}
 {% load allauth account socialaccount %}
-{% load crispy_forms_tags %}
 {% load custom_filters %}
 {% block head_title %}
     {% trans "Signup" %}
@@ -31,11 +30,105 @@
                               method="post"
                               action="{% url 'account_signup' %}">
                             {% csrf_token %}
-                            {{ form|crispy }}
+                            <div class="form-control">
+                                <label for="{{ form.first_name.id_for_label }}" class="label">
+                                    <span class="label-text">{{ form.first_name.label }}</span>
+                                </label>
+                                <input type="text"
+                                       name="{{ form.first_name.html_name }}"
+                                       id="{{ form.first_name.id_for_label }}"
+                                       class="input input-bordered w-full"
+                                       placeholder="First Name">
+                                {% for error in form.first_name.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-control">
+                                <label for="{{ form.last_name.id_for_label }}" class="label">
+                                    <span class="label-text">{{ form.last_name.label }}</span>
+                                </label>
+                                <input type="text"
+                                       name="{{ form.last_name.html_name }}"
+                                       id="{{ form.last_name.id_for_label }}"
+                                       class="input input-bordered w-full"
+                                       placeholder="Last Name">
+                                {% for error in form.last_name.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-control">
+                                <label for="{{ form.username.id_for_label }}" class="label">
+                                    <span class="label-text">{{ form.username.label }}</span>
+                                </label>
+                                <input type="text"
+                                       name="{{ form.username.html_name }}"
+                                       id="{{ form.username.id_for_label }}"
+                                       class="input input-bordered w-full"
+                                       placeholder="Username">
+                                {% for error in form.username.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-control">
+                                <label for="{{ form.email.id_for_label }}" class="label">
+                                    <span class="label-text">{{ form.email.label }}</span>
+                                </label>
+                                <input type="email"
+                                       name="{{ form.email.html_name }}"
+                                       id="{{ form.email.id_for_label }}"
+                                       class="input input-bordered w-full"
+                                       placeholder="Email address">
+                                {% for error in form.email.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-control">
+                                <label for="{{ form.password1.id_for_label }}" class="label">
+                                    <span class="label-text">{{ form.password1.label }}</span>
+                                </label>
+                                <input type="password"
+                                       name="{{ form.password1.html_name }}"
+                                       id="{{ form.password1.id_for_label }}"
+                                       class="input input-bordered w-full"
+                                       placeholder="Password">
+                                {% if form.password1.help_text %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-info">{{ form.password1.help_text|safe }}</span>
+                                    </label>
+                                {% endif %}
+                                {% for error in form.password1.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-control">
+                                <label for="{{ form.password2.id_for_label }}" class="label">
+                                    <span class="label-text">{{ form.password2.label }}</span>
+                                </label>
+                                <input type="password"
+                                       name="{{ form.password2.html_name }}"
+                                       id="{{ form.password2.id_for_label }}"
+                                       class="input input-bordered w-full"
+                                       placeholder="Confirm Password">
+                                {% for error in form.password2.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
                             {% if redirect_field_value %}
                                 <input type="hidden"
                                        name="{{ redirect_field_name }}"
-                                       value="{{ redirect_field_value }}" />
+                                       value="{{ redirect_field_value }}">
                             {% endif %}
                             <button class="btn btn-primary w-full" type="submit">{% trans "Sign Up" %}</button>
                         </form>

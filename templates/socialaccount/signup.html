@@ -1,6 +1,5 @@
 {% extends "_base.html" %}
 {% load i18n allauth %}
-{% load crispy_forms_tags %}
 {% block head_title %}
   {% trans "Sign Up" %}
 {% endblock head_title %}
@@ -36,7 +35,36 @@
                 method="post"
                 action="{% url 'socialaccount_signup' %}">
             {% csrf_token %}
-            {{ form|crispy }}
+            <div class="form-control">
+              <label for="{{ form.username.id_for_label }}" class="label">
+                <span class="label-text">{{ form.username.label }}</span>
+              </label>
+              <input type="text"
+                     name="{{ form.username.html_name }}"
+                     id="{{ form.username.id_for_label }}"
+                     class="input input-bordered w-full"
+                     placeholder="{{ form.username.label }}">
+              {% for error in form.username.errors %}
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ error }}</span>
+                </label>
+              {% endfor %}
+            </div>
+            <div class="form-control">
+              <label for="{{ form.email.id_for_label }}" class="label">
+                <span class="label-text">{{ form.email.label }}</span>
+              </label>
+              <input type="email"
+                     name="{{ form.email.html_name }}"
+                     id="{{ form.email.id_for_label }}"
+                     class="input input-bordered w-full"
+                     placeholder="{{ form.email.label }}">
+              {% for error in form.email.errors %}
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ error }}</span>
+                </label>
+              {% endfor %}
+            </div>
             {% if redirect_field_value %}
               <input type="hidden"
                      name="{{ redirect_field_name }}"

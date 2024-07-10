@@ -2,7 +2,6 @@
 {% load i18n %}
 {% load allauth %}
 {% load custom_filters %}
-{% load crispy_forms_tags %}
 {% block extra_css %}
     <style>
         .mfa-recovery-codes-container {
@@ -46,7 +45,6 @@
                           action="{% url 'mfa_generate_recovery_codes' %}"
                           class="mt-8 space-y-6">
                         {% csrf_token %}
-                        {{ form|crispy }}
                         <div class="flex flex-col space-y-4">
                             <button type="submit"
                                     class="btn

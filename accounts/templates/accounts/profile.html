@@ -1,14 +1,9 @@
 {% extends "_base.html" %}
 {% load custom_filters %}
-<!-- load i18n -->
 {% load i18n %}
-<!-- load crispy_forms_tags -->
-{% load crispy_forms_tags %}
-<!-- Title -->
 {% block head_title %}
     Profile
 {% endblock head_title %}
-<!-- Extra CSS -->
 {% block extra_css %}
     <style>
         .profile-container {
@@ -17,8 +12,9 @@
             background-position: center;
         }
     </style>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 {% endblock extra_css %}
-<!-- Content -->
 {% block content %}
     <div class="profile-container min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
@@ -33,9 +29,56 @@
                                  height="96" />
                         </div>
                     </div>
-                    <form method="post" class="mt-4 space-y-6">
+                    <form method="post" class="mt-2 space-y-6">
                         {% csrf_token %}
-                        {{ form|crispy }}
+                        {% for field in form %}
+                            <div class="form-control">
+                                <label for="{{ field.id_for_label }}" class="label">
+                                    <span class="label-text">{{ field.label|upper }}</span>
+                                </label>
+                                {% if field.name == 'preferred_model' %}
+                                    <select name="{{ field.html_name }}"
+                                            id="{{ field.id_for_label }}"
+                                            class="select select-bordered w-full">
+                                        {% for choice in field.field.choices %}
+                                            <option value="{{ choice.0 }}"
+                                                    {% if choice.0|stringformat:"s" == field.value|stringformat:"s" %}selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% elif field.name == 'bio' %}
+                                    <textarea name="{{ field.html_name }}"
+                                              id="{{ field.id_for_label }}"
+                                              class="textarea textarea-bordered h-24"
+                                              {% if field.field.max_length %}
+                                                  maxlength="{{ field.field.max_length }}"
+                                              {% endif %}>{{ field.value|default:'' }}</textarea>
+                                {% elif field.name == 'birth_date' %}
+                                    <input type="text"
+                                           name="{{ field.html_name }}"
+                                           id="{{ field.id_for_label }}"
+                                           class="input input-bordered w-full datepicker"
+                                           value="{{ field.value|date:'Y-m-d' }}"
+                                           placeholder="Select your birth date">
+                                {% else %}
+                                    <input type="{{ field.field.widget.input_type }}"
+                                           name="{{ field.html_name }}"
+                                           id="{{ field.id_for_label }}"
+                                           class="input input-bordered w-full"
+                                           value="{{ field.value|default:'' }}"
+                                           {% if field.field.max_length %}maxlength="{{ field.field.max_length }}"{% endif %}>
+                                {% endif %}
+                                {% if field.help_text %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-info">{{ field.help_text }}</span>
+                                    </label>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
                         <div>
                             <button type="submit" class="btn btn-primary w-full">{% trans "Save Changes" %}</button>
                         </div>
@@ -49,15 +92,45 @@
                             <span class="font-bold">{% trans "Email" %}:</span> {{ user.email }}
                         </p>
                         <p>
+                            <span class="font-bold">{% trans "First Name" %}:</span> {{ user.first_name }}
+                        </p>
+                        <p>
+                            <span class="font-bold">{% trans "Last Name" %}:</span> {{ user.last_name }}
+                        </p>
+                        <p>
                             <span class="font-bold">{% trans "Joined" %}:</span> {{ user.date_joined|date:"F d, Y" }}
                         </p>
                     </div>
                     <div class="mt-6">
-                        <h2 class="text-xl font-bold mt-8 mb-4">{% trans "Multi-Factor Authentication" %}</h2>
-                        <a href="{% url 'mfa_index' %}" class="btn btn-primary w-full">{% trans "Manage MFA" %}</a>
+                        <h2 class="text-xl font-bold mb-4">{% trans "Account Management" %}</h2>
+                        <a href="{% url 'account_email' %}"
+                           class="btn btn-secondary w-full mb-2">{% trans "Manage Email" %}</a>
+                        <a href="{% url 'mfa_index' %}" class="btn btn-accent w-full">{% trans "Manage MFA" %}</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 {% endblock content %}
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize date picker
+            flatpickr(".datepicker", {
+                dateFormat: "Y-m-d",
+                maxDate: new Date(),
+                yearRange: "1900:{{ current_year }}",
+                altInput: true,
+                altFormat: "F j, Y"
+            });
+
+            // Make textarea expandable
+            const bioTextarea = document.getElementById('id_bio');
+            bioTextarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    </script>
+{% endblock extra_js %}

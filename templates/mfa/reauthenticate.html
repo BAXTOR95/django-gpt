@@ -1,6 +1,5 @@
 {% extends "account/base_reauthenticate.html" %}
 {% load i18n %}
-{% load crispy_forms_tags %}
 {% block reauthenticate_content %}
     <div class="mb-6">
         <p class="text-base-content">{% blocktranslate %}Enter an authenticator code:{% endblocktranslate %}</p>
@@ -9,7 +8,22 @@
           action="{% url 'mfa_reauthenticate' %}"
           class="space-y-6">
         {% csrf_token %}
-        {{ form|crispy }}
+        <div class="form-control">
+            <label for="{{ form.code.id_for_label }}" class="label">
+                <span class="label-text">{{ form.code.label }}</span>
+            </label>
+            <input type="text"
+                   name="{{ form.code.html_name }}"
+                   id="{{ form.code.id_for_label }}"
+                   class="input input-bordered w-full"
+                   placeholder="{{ form.code.label }}"
+                   autocomplete="one-time-code">
+            {% for error in form.code.errors %}
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ error }}</span>
+                </label>
+            {% endfor %}
+        </div>
         {{ redirect_field }}
         <div class="mt-6">
             <button type="submit" class="btn btn-primary w-full">{% trans "Confirm" %}</button>

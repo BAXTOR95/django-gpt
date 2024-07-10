@@ -1,7 +1,6 @@
 {% extends "_base.html" %}
 {% load i18n %}
 {% load allauth %}
-{% load crispy_forms_tags %}
 {% load custom_filters %}
 {% block head_title %}
     {% translate "Sign In" %}
@@ -37,7 +36,21 @@
                           action="{% url 'account_confirm_login_code' %}"
                           class="mt-8 space-y-6">
                         {% csrf_token %}
-                        {{ form|crispy }}
+                        <div class="form-control">
+                            <label for="{{ form.code.id_for_label }}" class="label">
+                                <span class="label-text">{{ form.code.label }}</span>
+                            </label>
+                            <input type="text"
+                                   name="{{ form.code.html_name }}"
+                                   id="{{ form.code.id_for_label }}"
+                                   class="input input-bordered w-full"
+                                   placeholder="{{ form.code.label }}">
+                            {% for error in form.code.errors %}
+                                <label class="label">
+                                    <span class="label-text-alt text-error">{{ error }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
                         {{ redirect_field }}
                         <div>
                             <button type="submit" class="btn btn-primary w-full">{% translate "Sign In" %}</button>

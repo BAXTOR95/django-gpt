@@ -1,7 +1,6 @@
 {% extends "_base.html" %}
 {% load i18n %}
 {% load allauth account socialaccount %}
-{% load crispy_forms_tags %}
 {% load custom_filters %}
 {% block head_title %}
     {% trans "Sign In" %}
@@ -30,11 +29,59 @@
                               method="post"
                               action="{% url 'account_login' %}">
                             {% csrf_token %}
-                            {{ form|crispy }}
+                            <div class="form-control">
+                                <label for="{{ form.login.id_for_label }}" class="label">
+                                    <span class="label-text">{{ form.login.label }}</span>
+                                </label>
+                                <input type="text"
+                                       name="{{ form.login.html_name }}"
+                                       id="{{ form.login.id_for_label }}"
+                                       class="input input-bordered w-full"
+                                       placeholder="{{ form.login.field.widget.attrs.placeholder }}">
+                                {% for error in form.login.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-control">
+                                <label for="{{ form.password.id_for_label }}" class="label">
+                                    <span class="label-text">{{ form.password.label }}</span>
+                                </label>
+                                <input type="password"
+                                       name="{{ form.password.html_name }}"
+                                       id="{{ form.password.id_for_label }}"
+                                       class="input input-bordered w-full"
+                                       autocomplete="current-password">
+                                {% if form.password.help_text %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-info">{{ form.password.help_text|safe }}</span>
+                                    </label>
+                                {% endif %}
+                                {% for error in form.password.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-control">
+                                <label for="{{ form.remember.id_for_label }}" class="cursor-pointer label">
+                                    <span class="label-text">{{ form.remember.label }}</span>
+                                    <input type="checkbox"
+                                           name="{{ form.remember.html_name }}"
+                                           id="{{ form.remember.id_for_label }}"
+                                           class="checkbox">
+                                </label>
+                                {% for error in form.remember.errors %}
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">{{ error }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
                             {% if redirect_field_value %}
                                 <input type="hidden"
                                        name="{{ redirect_field_name }}"
-                                       value="{{ redirect_field_value }}" />
+                                       value="{{ redirect_field_value }}">
                             {% endif %}
                             <button class="btn btn-primary w-full" type="submit">{% trans "Sign In" %}</button>
                         </form>
@@ -67,30 +114,3 @@
         </div>
     </div>
 {% endblock content %}
-{% block extra_js %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const rateLimitMessage = document.getElementById('rate-limit-message');
-            const countdown = document.getElementById('countdown');
-
-            if (rateLimitMessage) {
-                let timeLeft = 300; // 5 minutes in seconds
-
-                function updateCountdown() {
-                    const minutes = Math.floor(timeLeft / 60);
-                    const seconds = timeLeft % 60;
-                    countdown.textContent = `Try again in ${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-                    if (timeLeft > 0) {
-                        timeLeft--;
-                        setTimeout(updateCountdown, 1000);
-                    } else {
-                        rateLimitMessage.parentElement.style.display = 'none';
-                    }
-                }
-
-                updateCountdown();
-            }
-        });
-    </script>
-{% endblock extra_js %}
