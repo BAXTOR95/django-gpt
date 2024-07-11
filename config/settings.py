@@ -69,6 +69,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django_browser_reload.middleware.BrowserReloadMiddleware',
+    'config.middleware.rate_limit_middleware.RateLimitLogMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -175,25 +176,60 @@ STATICFILES_FINDERS = [
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
     'handlers': {
         'console': {
             'level': 'DEBUG',
+            'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
         },
         'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'ratelimit.log',
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'django_warnings.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
         },
     },
     'loggers': {
-        'two_factor': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        }
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
+        'django': {
+            'handlers': ['console', 'file'],
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'allauth': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+        'config.middleware.rate_limit_middleware': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        '': {  # Root logger
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
+        },
     },
 }
 
@@ -209,7 +245,6 @@ UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS_KEY')
 
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
@@ -242,13 +277,10 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 LOGIN_URL = 'account_login'
 LOGOUT_REDIRECT_URL = 'home'
-SOCIALACCOUNT_QUERY_EMAIL = True
-ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'profile'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
@@ -259,9 +291,6 @@ ACCOUNT_FORMS = {
 
 # MFA settings
 MFA_ADAPTER = "allauth.mfa.adapter.DefaultMFAAdapter"
-
-# Email backend (for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Session configuration for "Remember Me" functionality
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
@@ -287,3 +316,29 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
     },
 }
+
+# Rate Limiting
+
+ACCOUNT_RATE_LIMITS = {
+    "login": "20/m/ip",  # 20 login attempts per minute per IP
+    "login_failed": "5/5m/ip",  # 5 failed login attempts per 5 minutes per IP
+    "signup": "5/d/ip",  # 5 signups per day per IP
+    "send_mail": "2/d/user",  # 2 mails per day per user
+}
+
+# Cache settings
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+# Other security settings
+
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SESSION_COOKIE_SECURE = True  # for HTTPS sites
+CSRF_COOKIE_SECURE = True  # for HTTPS sites
+X_FRAME_OPTIONS = 'DENY'

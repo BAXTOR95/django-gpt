@@ -315,3 +315,5 @@ dist
 CACHE/
 
 code_base.pdf
+
+django_warnings.log

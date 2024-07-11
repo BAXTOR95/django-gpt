@@ -1,0 +1,9 @@
+{% extends "_base.html" %}
+{% block title %}Bad Request{% endblock title %}
+{% block content %}
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-4">400 - Bad Request</h1>
+        <p class="mb-4">The server cannot process the request due to something that is perceived to be a client error.</p>
+        <a href="{% url 'home' %}" class="btn btn-primary">Go to Homepage</a>
+    </div>
+{% endblock content %}
