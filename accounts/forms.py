@@ -8,6 +8,7 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields = [
             'openai_api_key',
+            'openai_api_quota',
             'preferred_model',
             'bio',
             'location',

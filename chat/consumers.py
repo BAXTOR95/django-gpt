@@ -106,16 +106,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     model=model,
                     messages=self.messages,
                     stream=True,
+                    stream_options={"include_usage": True},
                 )
 
                 ai_message_content = []
                 async for chunk in openai_response:
-                    message_chunk = chunk.choices[0].delta.content or ''
-                    formatted_chunk = message_chunk.replace("\n", "<br>")
-                    await self.send(
-                        text_data=f'<div id="{message_id}" hx-swap-oob="beforeend">{formatted_chunk}</div>'
-                    )
-                    ai_message_content.append(message_chunk)
+                    if chunk.choices:
+                        message_chunk = chunk.choices[0].delta.content or ''
+                        formatted_chunk = message_chunk.replace("\n", "<br>")
+                        await self.send(
+                            text_data=f'<div id="{message_id}" hx-swap-oob="beforeend">{formatted_chunk}</div>'
+                        )
+                        ai_message_content.append(message_chunk)
+                    elif chunk.usage:
+                        # Update user's token usage
+                        await self.update_token_usage(chunk.usage)
 
                 # Save AI message
                 full_ai_message = ''.join(ai_message_content)
@@ -152,8 +157,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
             new_title = response.choices[0].message.content.strip()
             await self.update_chat_title(new_title)
+            await self.update_token_usage(response.usage)
         except Exception as e:
             logger.error(f"Error generating chat title: {str(e)}")
+
+    @database_sync_to_async
+    def update_token_usage(self, usage):
+        self.user_profile.openai_api_usage += usage.total_tokens
+        self.user_profile.save()
+
+        if self.user_profile.openai_api_usage >= self.user_profile.openai_api_quota:
+            self.send_error_message(
+                "Warning: You are approaching your API usage limit."
+            )
 
     @database_sync_to_async
     def update_chat_title(self, new_title):

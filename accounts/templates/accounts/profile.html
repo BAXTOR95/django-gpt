@@ -83,6 +83,17 @@
                             <button type="submit" class="btn btn-primary w-full">{% trans "Save Changes" %}</button>
                         </div>
                     </form>
+                    <div class="card bg-base-100 shadow-xl mt-6">
+                        <div class="card-body">
+                            <h2 class="card-title">{% trans "Open API Usage" %}</h2>
+                            <p>{% trans "Total tokens used" %}: {{ user.userprofile.openai_api_usage }}</p>
+                            <p>{% trans "API Quota" %}: {{ user.userprofile.openai_api_quota }}</p>
+                            <progress class="progress progress-primary w-56"
+                                      value="{{ user.userprofile.get_usage_percentage }}"
+                                      max="100"></progress>
+                            <p>{{ user.userprofile.get_usage_percentage|floatformat:2 }}{% trans "% of quota used" %}</p>
+                        </div>
+                    </div>
                     <div class="divider">{% trans "Profile Information" %}</div>
                     <div class="space-y-2">
                         <p>
