@@ -1,83 +1,63 @@
 <div class="flex flex-col h-full">
-	<!-- Header -->
-	<div id="chat-header" class="bg-base-300 p-4 shadow-md flex-shrink-0">
-		{% include 'chat/components/chat_header.html' %}
-	</div>
-
-	<!-- Chat Interface -->
-	{% if current_chat %}
-	<div
-		id="chat-messages"
-		class="flex-1 flex flex-col bg-base-100 overflow-hidden"
-		hx-ext="ws"
-		ws-connect="/ws/chat/{{ current_chat.id }}/"
-	>
-		<div
-			class="flex-none h-full px-4 sm:px-6 md:px-0 overflow-hidden lg:overflow-auto scrollbar:!w-1.5 scrollbar:!h-1.5 scrollbar:bg-transparent scrollbar-track:!bg-slate-100 scrollbar-thumb:!rounded scrollbar-thumb:!bg-slate-300 scrollbar-track:!rounded dark:scrollbar-track:!bg-slate-500/[0.16] dark:scrollbar-thumb:!bg-slate-500/50 max-h-[calc(100vh-14rem)] lg:supports-scrollbars:pr-2"
-			id="messages-container"
-		>
-			<div class="px-4 py-6 space-y-4">
-				{% include 'chat/components/chat_messages.html' %}
-			</div>
-		</div>
-
-		<!-- Message Input Area -->
-		<div id="message-input" class="p-4 flex-shrink-0">
-			{% include 'chat/components/message_input.html' %}
-		</div>
-	</div>
-
-	{% else %}
-	<div
-		id="chat-messages"
-		class="flex-1 flex items-center justify-center bg-base-100 p-8"
-	>
-		<div class="card w-96 bg-base-200 shadow-xl">
-			<div class="card-body items-center text-center">
-				<h2 class="card-title">Welcome to DjangoGPT!</h2>
-				<p class="text-base-content/70">
-					Select a chat or create a new one to start messaging.
-				</p>
-				<div class="card-actions justify-end">
-					<button
-						class="btn btn-primary"
-						hx-post="{% url 'create_chat' %}"
-						hx-target="#sidebar"
-						hx-swap="innerHTML"
-					>
-						Create New Chat
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	{% endif %}
+    <!-- Header -->
+    <div id="chat-header" class="bg-base-300 p-4 shadow-md flex-shrink-0">
+        {% include "chat/components/chat_header.html" %}
+    </div>
+    <!-- Chat Interface -->
+    {% if current_chat %}
+        <div id="chat-messages"
+             class="flex-1 flex flex-col bg-base-100 overflow-hidden"
+             hx-ext="ws"
+             ws-connect="/ws/chat/{{ current_chat.id }}/">
+            <div class="flex-none h-full px-4 sm:px-6 md:px-0 overflow-hidden lg:overflow-auto scrollbar:!w-1.5 scrollbar:!h-1.5 scrollbar:bg-transparent scrollbar-track:!bg-slate-100 scrollbar-thumb:!rounded scrollbar-thumb:!bg-slate-300 scrollbar-track:!rounded dark:scrollbar-track:!bg-slate-500/[0.16] dark:scrollbar-thumb:!bg-slate-500/50 max-h-[calc(100vh-14rem)] lg:supports-scrollbars:pr-2"
+                 id="messages-container">
+                <div class="px-4 py-6 space-y-4">{% include "chat/components/chat_messages.html" %}</div>
+            </div>
+            <!-- Message Input Area -->
+            <div id="message-input" class="p-4 flex-shrink-0">{% include "chat/components/message_input.html" %}</div>
+        </div>
+    {% else %}
+        <div id="chat-messages"
+             class="flex-1 flex items-center justify-center bg-base-100 p-8">
+            <div class="card w-96 bg-base-200 shadow-xl">
+                <div class="card-body items-center text-center">
+                    <h2 class="card-title">Welcome to DjangoGPT!</h2>
+                    <p class="text-base-content/70">Select a chat or create a new one to start messaging.</p>
+                    <div class="card-actions justify-end">
+                        <button class="btn btn-primary"
+                                hx-post="{% url 'create_chat' %}"
+                                hx-target="#sidebar"
+                                hx-swap="innerHTML">Create New Chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
-
 <script>
-	document.body.addEventListener('htmx:wsAfterMessage', function (event) {
-		const message = JSON.parse(event.detail.message);
-		if (message.type === 'chat_title_update') {
-			const headerTitle = document.querySelector('#chat-header h1');
-			if (headerTitle) {
-				headerTitle.textContent = message.new_title;
-			}
-		}
-	});
+    document.body.addEventListener('htmx:wsAfterMessage', function(event) {
+        const message = JSON.parse(event.detail.message);
+        if (message.type === 'chat_title_update') {
+            const headerTitle = document.querySelector('#chat-header h1');
+            if (headerTitle) {
+                headerTitle.textContent = message.new_title;
+            }
+        }
+    });
 
-	// Scroll to bottom of chat messages when new message is added
-	function scrollToBottom() {
-		const messagesContainer = document.getElementById('messages-container');
-		if (messagesContainer) {
-			messagesContainer.scrollTop = messagesContainer.scrollHeight;
-		}
-	}
+    // Scroll to bottom of chat messages when new message is added
+    function scrollToBottom() {
+        const messagesContainer = document.getElementById('messages-container');
+        if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    }
 
-	document.body.addEventListener('htmx:afterOnLoad', function (event) {
-		if (event.detail.elt.id === 'messages-container') {
-			scrollToBottom();
-		}
-	});
+    document.body.addEventListener('htmx:afterOnLoad', function(event) {
+        if (event.detail.elt.id === 'messages-container') {
+            scrollToBottom();
+        }
+    });
 
-	document.body.addEventListener('htmx:wsAfterMessage', scrollToBottom);
+    document.body.addEventListener('htmx:wsAfterMessage', scrollToBottom);
 </script>

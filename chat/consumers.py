@@ -31,7 +31,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         self.user_profile = await self.get_user_profile()
 
-        if self.chat and self.user_profile and self.user_profile.openai_api_key:
+        if self.chat and self.user_profile:
             self.messages = await self.load_chat_history()
             await self.channel_layer.group_add(
                 f"chat_{self.chat_id}", self.channel_name
@@ -48,6 +48,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         logger.info(f"Received WebSocket message: {text_data}")
         try:
+            if not self.user_profile.openai_api_key:
+                await self.send_error_message(
+                    "OpenAI API key is missing. Please add it in your profile settings."
+                )
+                return
+
             text_data_json = json.loads(text_data)
             message_text = text_data_json['message']
             logger.info(f"Parsed message: {message_text}")
@@ -93,7 +99,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             model = await self.get_model_name()
 
             if not model:
-                raise ValueError("No LLM model specified")
+                raise self.send_error_message("No LLM model specified")
 
             try:
                 openai_response = await client.chat.completions.create(
@@ -119,12 +125,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.messages.append({"role": "assistant", "content": full_ai_message})
 
             except Exception as e:
-                error_message = f"An error occurred: {str(e)}"
-                await self.send(
-                    text_data=f'<div id="{message_id}" hx-swap-oob="beforeend">{error_message}</div>'
+                error_message = (
+                    f"An error occurred while communicating with the LLM: {str(e)}"
                 )
+                await self.send_error_message(error_message)
         except Exception as e:
             logger.error(f"Error processing WebSocket message: {str(e)}")
+
+    async def send_error_message(self, message):
+        error_html = render_to_string('ws/error_message.html', {'message': message})
+        await self.send(text_data=error_html)
 
     async def generate_chat_title(self, first_message):
         client = AsyncOpenAI(api_key=self.user_profile.openai_api_key)

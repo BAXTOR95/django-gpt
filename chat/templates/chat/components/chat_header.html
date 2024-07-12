@@ -1,120 +1,94 @@
 <div class="flex items-center justify-between">
-	<div class="flex items-center space-x-4">
-		<div class="avatar placeholder">
-			<div class="bg-neutral text-neutral-content rounded-full w-12">
-				<span class="text-xl"
-					>{{ current_chat.title|default:"?" |slice:":1"|upper }}</span
-				>
-			</div>
-		</div>
-		<div>
-			<h1
-				id="chat-header-title"
-				class="text-2xl font-bold"
-				data-chat-id="{{ current_chat.id }}"
-			>
-				{{ current_chat.title|default:"Select a chat" }}
-			</h1>
-			{% if current_chat %}
-			<p class="text-sm text-base-content/70">
-				Created: {{ current_chat.created_at|date:"F j, Y" }}
-			</p>
-			{% endif %}
-		</div>
-	</div>
-
-	{% if current_chat %}
-	<div class="flex items-center space-x-2">
-		<form
-			hx-post="{% url 'select_model' current_chat.id %}"
-			hx-target="#chat-header"
-			hx-trigger="change from:select[name='model_id']"
-			class="form-control w-full max-w-xs"
-		>
-			{% csrf_token %}
-			<select name="model_id" class="select select-bordered select-sm">
-				<option disabled>Choose LLM model</option>
-				{% for model in llm_models %}
-				<option
-                    value="{{ model.id }}"
-                    {% if current_chat.llm_model == model %}
-                        selected
-                    {% elif not current_chat.llm_model and model == preferred_model %}
-                        selected
-                    {% endif %}
-                >
-                    {{ model.name }}
-                </option>
-				{% endfor %}
-			</select>
-		</form>
-		<div class="dropdown dropdown-end">
-			<label tabindex="0" class="btn btn-ghost btn-circle">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M4 6h16M4 12h16M4 18h7"
-					/>
-				</svg>
-			</label>
-			<ul
-				tabindex="0"
-				class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-			>
-				<li>
-					<a onclick="editHeaderChatTitle({{ current_chat.id }})">Rename Chat</a>
-				</li>
-				<li>
-					<a
-						hx-post="{% url 'delete_chat' current_chat.id %}"
-						hx-confirm="Are you sure you want to delete this chat?"
-						hx-target="#sidebar"
-						class="text-error"
-						>Delete Chat</a
-					>
-				</li>
-			</ul>
-		</div>
-	</div>
-	{% endif %}
+    <div class="flex items-center space-x-4">
+        <div class="avatar placeholder">
+            <div class="bg-neutral text-neutral-content rounded-full w-12">
+                <span class="text-xl">{{ current_chat.title|default:"?" |slice:":1"|upper }}</span>
+            </div>
+        </div>
+        <div>
+            <h1 id="chat-header-title"
+                class="text-2xl font-bold"
+                data-chat-id="{{ current_chat.id }}">{{ current_chat.title|default:"Select a chat" }}</h1>
+            {% if current_chat %}
+                <p class="text-sm text-base-content/70">Created: {{ current_chat.created_at|date:"F j, Y" }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% if current_chat %}
+        <div class="flex items-center space-x-2">
+            <form hx-post="{% url 'select_model' current_chat.id %}"
+                  hx-target="#chat-header"
+                  hx-trigger="change from:select[name='model_id']"
+                  class="form-control w-full max-w-xs">
+                {% csrf_token %}
+                <select name="model_id" class="select select-bordered select-sm">
+                    <option disabled>Choose LLM model</option>
+                    {% for model in llm_models %}
+                        <option value="{{ model.id }}"
+                                {% if current_chat.llm_model == model %}
+                                    selected
+                                {% elif not current_chat.llm_model and model == preferred_model %}
+                                    selected
+                                {% endif %}>{{ model.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-5 w-5"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                </label>
+                <ul tabindex="0"
+                    class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <li>
+                        <a onclick="editHeaderChatTitle({{ current_chat.id }})">Rename Chat</a>
+                    </li>
+                    <li>
+                        <a hx-post="{% url 'delete_chat' current_chat.id %}"
+                           hx-confirm="Are you sure you want to delete this chat?"
+                           hx-target="#sidebar"
+                           class="text-error">Delete Chat</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    {% endif %}
 </div>
-
 <script>
-	document.body.addEventListener('htmx:wsAfterMessage', function (event) {
-		const message = JSON.parse(event.detail.message);
-		if (message.type === 'chat_title_update') {
-			const headerTitle = document.getElementById('chat-header-title');
-			if (headerTitle && headerTitle.dataset.chatId === message.chat_id) {
-				headerTitle.textContent = message.new_title;
-			}
-			// Update avatar initial
-			const avatarInitial = document.querySelector('.avatar .bg-neutral span');
-			if (avatarInitial) {
-				avatarInitial.textContent = message.new_title.charAt(0).toUpperCase();
-			}
-		}
-	});
+    document.body.addEventListener('htmx:wsAfterMessage', function(event) {
+        const message = JSON.parse(event.detail.message);
+        if (message.type === 'chat_title_update') {
+            const headerTitle = document.getElementById('chat-header-title');
+            if (headerTitle && headerTitle.dataset.chatId === message.chat_id) {
+                headerTitle.textContent = message.new_title;
+            }
+            // Update avatar initial
+            const avatarInitial = document.querySelector('.avatar .bg-neutral span');
+            if (avatarInitial) {
+                avatarInitial.textContent = message.new_title.charAt(0).toUpperCase();
+            }
+        }
+    });
 
-	function editHeaderChatTitle(chatId) {
-		const headerTitle = document.getElementById('chat-header-title');
-		const currentTitle = headerTitle.textContent.trim();
-		const newTitle = prompt('Enter new chat title:', currentTitle);
-		if (newTitle && newTitle !== currentTitle) {
+    function editHeaderChatTitle(chatId) {
+        const headerTitle = document.getElementById('chat-header-title');
+        const currentTitle = headerTitle.textContent.trim();
+        const newTitle = prompt('Enter new chat title:', currentTitle);
+        if (newTitle && newTitle !== currentTitle) {
             htmx.ajax('POST', `/chat/update-chat-title/${chatId}/`, {
                 target: '#sidebar',
                 swap: 'innerHTML',
-                values: { title: newTitle },
+                values: {
+                    title: newTitle
+                },
             }).then(function() {
                 headerTitle.textContent = newTitle;
             });
-		}
-	}
+        }
+    }
 </script>
