@@ -1,4 +1,6 @@
 {% load custom_filters %}
+{% load chat_filters %}
+{% load i18n %}
 {% if current_chat %}
     <div id="message-list" class="flex-1 px-4 py-6 space-y-6">
         {% for message in messages %}
@@ -11,9 +13,15 @@
                 <div class="chat-image avatar">
                     <div class="w-10 rounded-full">
                         {% if message.is_user %}
-                            <img src="{{ user.email|gravatar_url }}" alt="User Avatar" height="10" width="10" />
+                            <img src="{{ user.email|gravatar_url }}"
+                                 alt="User Avatar"
+                                 height="10"
+                                 width="10" />
                         {% else %}
-                            <img src="https://api.dicebear.com/6.x/bottts/svg?seed=AI" alt="AI Avatar" height="10" width="10" />
+                            <img src="https://api.dicebear.com/6.x/bottts/svg?seed=AI"
+                                 alt="AI Avatar"
+                                 height="10"
+                                 width="10" />
                         {% endif %}
                     </div>
                 </div>
@@ -21,7 +29,7 @@
                     {% if message.is_user %}
                         {{ user.username }}
                     {% else %}
-                        AI Assistant
+                        {% trans "AI Assistant" %}
                     {% endif %}
                     <time class="text-xs opacity-50 ml-1">{{ message.timestamp|date:"H:i" }}</time>
                 </div>
@@ -30,8 +38,8 @@
                                 bg-primary text-primary-content
                             {% else %}
                                 bg-base-200 text-base-content
-                            {% endif %}">{{ message.content|linebreaksbr }}</div>
-                <div class="chat-footer opacity-50 text-xs">Delivered</div>
+                            {% endif %}">{{ message.content|markdown_to_html }}</div>
+                <div class="chat-footer opacity-50 text-xs">{% trans "Delivered" %}</div>
             </div>
         {% endfor %}
     </div>
@@ -43,7 +51,9 @@
                     <span class="text-3xl">?</span>
                 </div>
             </div>
-            <p class="text-xl font-semibold text-base-content/70">Select a chat or create a new one to start messaging.</p>
+            <p class="text-xl font-semibold text-base-content/70">
+                {% trans "Select a chat or create a new one to start messaging." %}
+            </p>
         </div>
     </div>
 {% endif %}

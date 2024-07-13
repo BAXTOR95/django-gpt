@@ -22,6 +22,52 @@
             <link rel="stylesheet" href="{% static 'src/output.css' %}" />
         {% endcompress %}
         <!-- Extra CSS -->
+        <style>
+            .chat-bubble pre {
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 1em;
+                border-radius: 0.5em;
+                overflow-x: auto;
+            }
+
+            .chat-bubble code {
+                font-family: monospace;
+                background-color: rgba(0, 0, 0, 0.1);
+                padding: 0.2em 0.4em;
+                border-radius: 0.3em;
+            }
+
+            .chat-bubble blockquote {
+                border-left: 3px solid rgba(0, 0, 0, 0.2);
+                padding-left: 1em;
+                margin-left: 0;
+                font-style: italic;
+            }
+
+            .chat-bubble ul,
+            .chat-bubble ol {
+                padding-left: 1.5em;
+            }
+
+            .chat-bubble ul {
+                list-style-type: disc;
+            }
+
+            .chat-bubble ol {
+                list-style-type: decimal;
+            }
+
+            .chat-bubble table {
+                border-collapse: collapse;
+                margin: 1em 0;
+            }
+
+            .chat-bubble th,
+            .chat-bubble td {
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                padding: 0.5em;
+            }
+        </style>
         {% block extra_css %}
         {% endblock extra_css %}
         {% block extra_media %}

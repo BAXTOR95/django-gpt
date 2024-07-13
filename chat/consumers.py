@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from .models import Chat, Message
 from accounts.models import UserProfile
 from openai import AsyncOpenAI
+from chat.templatetags.chat_filters import markdown_to_html
 
 logger = logging.getLogger(__name__)
 
@@ -113,11 +114,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 async for chunk in openai_response:
                     if chunk.choices:
                         message_chunk = chunk.choices[0].delta.content or ''
-                        formatted_chunk = message_chunk.replace("\n", "<br>")
-                        await self.send(
-                            text_data=f'<div id="{message_id}" hx-swap-oob="beforeend">{formatted_chunk}</div>'
-                        )
                         ai_message_content.append(message_chunk)
+
+                        # Convert the accumulated message to HTML
+                        html_content = markdown_to_html(''.join(ai_message_content))
+
+                        await self.send(
+                            text_data=f'<div id="{message_id}" hx-swap-oob="innerHTML">{html_content}</div>'
+                        )
                     elif chunk.usage:
                         # Update user's token usage
                         await self.update_token_usage(chunk.usage)
