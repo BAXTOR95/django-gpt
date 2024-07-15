@@ -4025,10 +4025,6 @@ html:has(.drawer-toggle:checked) {
   top: 0px;
 }
 
-.top-4 {
-  top: 1rem;
-}
-
 .z-40 {
   z-index: 40;
 }
@@ -4199,6 +4195,10 @@ html:has(.drawer-toggle:checked) {
   width: 13rem;
 }
 
+.w-56 {
+  width: 14rem;
+}
+
 .w-6 {
   width: 1.5rem;
 }
@@ -4217,10 +4217,6 @@ html:has(.drawer-toggle:checked) {
 
 .w-full {
   width: 100%;
-}
-
-.w-56 {
-  width: 14rem;
 }
 
 .max-w-md {

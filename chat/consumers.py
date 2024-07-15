@@ -2,6 +2,7 @@ import json
 import uuid
 import logging
 import re
+from pathlib import Path
 
 from django.utils import timezone
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -12,8 +13,19 @@ from .models import Chat, Message
 from accounts.models import UserProfile
 from openai import AsyncOpenAI
 from chat.templatetags.chat_filters import markdown_to_html
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger(__name__)
+
+
+def read_prompt(filename):
+    return Path(f'./prompts/{filename}.txt').read_text()
+
+
+def _batch_messages(messages, n):
+    """Yield successive n-sized batches from list of messages."""
+    for i in range(0, len(messages), n):
+        yield messages[i : i + n]
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -45,6 +57,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(
             f"chat_{self.chat_id}", self.channel_name
         )
+
+    @retry(
+        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10)
+    )
+    async def get_ai_response(self, client, model, messages):
+        try:
+            return await client.chat.completions.create(
+                model=model,
+                messages=messages,
+                stream=True,
+                stream_options={"include_usage": True},
+            )
+        except Exception as e:
+            logger.error(f"Error getting AI response: {str(e)}")
+            raise
 
     async def receive(self, text_data):
         logger.info(f"Received WebSocket message: {text_data}")
@@ -102,12 +129,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if not model:
                 raise self.send_error_message("No LLM model specified")
 
+            logger.debug(
+                f"""CONFIG:
+            Model: {model}
+            User: {self.user}
+            Chat ID: {self.chat_id}
+            Message: {message_text}
+            """
+            )
+
+            MAX_CONTEXT_MESSAGES = 20  # Adjust as needed
+            batched_messages = list(
+                _batch_messages(
+                    self.messages[-MAX_CONTEXT_MESSAGES:], MAX_CONTEXT_MESSAGES
+                )
+            )
+
             try:
-                openai_response = await client.chat.completions.create(
-                    model=model,
-                    messages=self.messages,
-                    stream=True,
-                    stream_options={"include_usage": True},
+                openai_response = await self.get_ai_response(
+                    client, model, batched_messages[-1]
                 )
 
                 ai_message_content = []
@@ -133,6 +173,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # Add the AI response to the history
                 self.messages.append({"role": "assistant", "content": full_ai_message})
 
+                # Check token limit
+                warning = await self.check_token_limit()
+                if warning:
+                    await self.send_error_message(warning)
+
             except Exception as e:
                 error_message = (
                     f"An error occurred while communicating with the LLM: {str(e)}"
@@ -148,13 +193,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def generate_chat_title(self, first_message):
         client = AsyncOpenAI(api_key=self.user_profile.openai_api_key)
         try:
+            system_prompt = read_prompt('chat_title_generator')
             response = await client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {
-                        "role": "system",
-                        "content": "Generate a short, descriptive title (5 words max) for a chat that starts with this message:",
-                    },
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": first_message},
                 ],
                 max_tokens=10,
@@ -170,10 +213,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user_profile.openai_api_usage += usage.total_tokens
         self.user_profile.save()
 
-        if self.user_profile.openai_api_usage >= self.user_profile.openai_api_quota:
-            self.send_error_message(
-                "Warning: You are approaching your API usage limit."
-            )
+    @database_sync_to_async
+    def check_token_limit(self):
+        limit_percentage = (
+            self.user_profile.openai_api_usage / self.user_profile.openai_api_quota
+        ) * 100
+        if limit_percentage > 80:
+            return f"Warning: You have used {limit_percentage:.2f}% of your API quota."
+        return None
 
     @database_sync_to_async
     def update_chat_title(self, new_title):
