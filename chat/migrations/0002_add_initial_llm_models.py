@@ -6,6 +6,7 @@ from django.db import migrations
 def add_initial_llm_models(apps, schema_editor):
     LLMModel = apps.get_model('chat', 'LLMModel')
     initial_models = [
+        'gpt-4o-mini',
         'gpt-4o',
         'gpt-4-turbo',
         'gpt-4',

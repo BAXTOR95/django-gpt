@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def read_prompt(filename):
-    return Path(f'./prompts/{filename}.txt').read_text()
+    return Path(f'./chat/prompts/{filename}.txt').read_text()
 
 
 def _batch_messages(messages, n):
@@ -195,7 +195,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             system_prompt = read_prompt('chat_title_generator')
             response = await client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": first_message},
@@ -224,7 +224,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def update_chat_title(self, new_title):
-        self.chat.title = re.sub(r'[^\w\s]', '', new_title)
+        self.chat.title = re.sub(r'[^\w\s:"]', '', new_title)
         self.chat.save()
         async_to_sync(self.channel_layer.group_send)(
             f"chat_{self.chat_id}",
